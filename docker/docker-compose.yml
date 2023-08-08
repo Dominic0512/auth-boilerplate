@@ -1,0 +1,17 @@
+# @format
+
+version: "3.8"
+services:
+  gateway:
+    container_name: gateway
+    build:
+      context: .
+      dockerfile: "./Dockerfile.node.dev"
+    environment:
+      - NAMESPACE=services
+      - SERVICE=gateway
+    ports:
+      - "10001:10001"
+    volumes:
+      - ../:/var/app/auth-boilerplate
+    restart: on-failure
