@@ -16,3 +16,17 @@ services:
     volumes:
       - ../:/var/app/auth-boilerplate
     restart: on-failure
+  user:
+    image: node-dev:local
+    container_name: user
+    build:
+      context: .
+      dockerfile: "./Dockerfile.node.dev"
+    environment:
+      - NAMESPACE=services
+      - SERVICE=user
+    ports:
+      - "10002:10002"
+    volumes:
+      - ../:/var/app/auth-boilerplate
+    restart: on-failure
