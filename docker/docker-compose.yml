@@ -2,6 +2,15 @@
 name: auth-boilerplate
 version: "3.9"
 services:
+  database:
+    image: cockroachdb/cockroach:v22.2.9
+    container_name: database
+    ports:
+      - "26257:26257"
+      - "26258:8080"
+    command: start-single-node --insecure
+    volumes:
+      - "../database/cockroach-data:/cockroach/cockroach-data"
   gateway:
     image: node-dev:local
     container_name: gateway
