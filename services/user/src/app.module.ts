@@ -7,6 +7,7 @@ import { createDatabase } from 'typeorm-extension';
 import databaseConfig from './config/database';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { AppService } from './app.service';
         return await new DataSource(options).initialize();
       },
     }),
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],

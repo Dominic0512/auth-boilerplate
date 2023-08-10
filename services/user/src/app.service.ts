@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AppService {
-  getHello(): string {
-    return 'Hello, this is user service api endpoint.';
+  health(): string {
+    return 'User service alive!';
   }
 }
