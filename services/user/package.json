@@ -76,5 +76,14 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
+  },
+  "nx": {
+    "targets": {
+      "start:dev": {
+        "configurations": {
+          "development": {}
+        }
+      }
+    }
   }
 }

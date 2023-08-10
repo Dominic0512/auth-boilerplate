@@ -21,7 +21,7 @@ services:
       - NAMESPACE=services
       - SERVICE=gateway
     ports:
-      - "10001:10001"
+      - "10001:8000"
     volumes:
       - ../:/var/app/auth-boilerplate
     restart: on-failure
@@ -35,7 +35,7 @@ services:
       - NAMESPACE=services
       - SERVICE=user
     ports:
-      - "10002:10002"
+      - "10002:8000"
     volumes:
       - ../:/var/app/auth-boilerplate
     restart: on-failure

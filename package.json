@@ -9,8 +9,8 @@
     "services/*",
     "sites/*"
   ],
-  "dependencies": {},
   "devDependencies": {
-    "lerna": "^7.0.2"
+    "lerna": "^7.0.2",
+    "nx": "^16.6.0"
   }
 }

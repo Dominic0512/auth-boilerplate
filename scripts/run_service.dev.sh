@@ -1,2 +1,2 @@
 #!/bin/sh
-pnpm run --prefix "./$NAMESPACE/$SERVICE" start:dev
+node_modules/.bin/nx run --verbose $SERVICE:start:dev:$NODE_ENV

@@ -6,9 +6,9 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.use(
-    '/api',
+    '/api/user',
     createProxyMiddleware({
-      target: 'http://user:10002',
+      target: 'http://user:8000',
       secure: false,
       onProxyReq: (_, req) => {
         console.log(
@@ -17,6 +17,6 @@ async function bootstrap() {
       },
     }),
   );
-  await app.listen(10001);
+  await app.listen(8000);
 }
 bootstrap();
