@@ -8,3 +8,4 @@ export class CreateUserDto {
   email: string;
   providers: ProviderDto[];
 }
+

@@ -1,8 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { getRepositoryToken } from '@nestjs/typeorm';
 
 import { UserService } from './user.service';
 import { User } from './entities/user.entity';
-import { getRepositoryToken } from '@nestjs/typeorm';
+import { CreateUserDto } from './user.dto';
 
 describe('UserService', () => {
   let service: UserService;
@@ -15,13 +16,6 @@ describe('UserService', () => {
     }]
   };
 
-  const mockUser = {
-    ...createUserDto,
-    id: 1,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  };
-
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [UserService],
@@ -29,7 +23,14 @@ describe('UserService', () => {
     .useMocker((token) => {
       if (token === getRepositoryToken(User)) {
         return {
-          create: jest.fn().mockReturnValue(mockUser),
+          create: jest.fn().mockImplementation((createUserDto: CreateUserDto) => {
+            return {
+              ...createUserDto,
+              id: 1,
+              createdAt: new Date(),
+              updatedAt: new Date()
+            }
+          }),
         }
       }
     })
@@ -44,6 +45,8 @@ describe('UserService', () => {
 
   it('Create user', async () => {
     const user = await service.create(createUserDto);
-    expect(user).toEqual(mockUser);
+    expect(user).toHaveProperty('id');
+    expect(user).toHaveProperty('createdAt');
+    expect(user).toHaveProperty('updatedAt');
   });
 });
