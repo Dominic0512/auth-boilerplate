@@ -1,3 +1,4 @@
+import camelcaseKeys from '@cjs-exporter/camelcase-keys';
 import { Injectable } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
 import { JwksClient } from 'jwks-rsa';
@@ -7,19 +8,19 @@ import { JwksClient } from 'jwks-rsa';
  * - https://{domain}/authorize?client_id={client_id}&response_type=id_token&connection={facebook|google}&prompt=login&scope=openid%20profile%20email&redirect_uri=https://jwt.io&state={state}&nonce={nonce}
  */
 export interface Auth0IdTokenPayload {
-  family_name: string,
-  nick_name: string,
+  familyName: string,
+  nickName: string,
   name: string,
   picture: string,
-  updated_at: Date,
+  updatedAt: Date,
   email: string,
-  email_verified: boolean,
+  emailVerified: boolean,
   iss: string,
   aud: string,
   iat: number,
   exp: number,
   sub: string,
-  auth_time: number,
+  authTime: number,
   sid: string,
   nonce: string;
 }
@@ -45,7 +46,7 @@ export class AuthService {
     this.publicKey = (await jwksClient.getSigningKey(auth0Kid)).getPublicKey();
   }
 
-  async verifyAuth0Token(token: string) {
+  verifyAuth0Token(token: string) {
     try {
       jwt.verify(token, this.publicKey);
       return { success: true };
@@ -62,7 +63,7 @@ export class AuthService {
   }
 
   decodeAuth0Token(token: string): Auth0IdTokenPayload {
-    return this.decodeToken<Auth0IdTokenPayload>(token);
+    return camelcaseKeys(this.decodeToken<Auth0IdTokenPayload>(token));
   }
 
   generateAuthToken<T extends object>(input: T, aging: number) {

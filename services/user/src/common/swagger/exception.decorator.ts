@@ -1,16 +1,16 @@
 import { applyDecorators, HttpStatus } from '@nestjs/common';
 import {
   ApiResponse,
-  ApiResponseOptions,
+  ApiResponseSchemaHost,
   getSchemaPath,
 } from '@nestjs/swagger';
 import { ExceptionDto } from './exception.dto';
 
-export function ApiExceptionDecorator(
+export function ApiExceptionDecorator<T>(
   statusCode: HttpStatus,
-  message: string,
+  message: string | T[],
   description?: string,
-  options?: ApiResponseOptions,
+  options?: ApiResponseSchemaHost,
 ) {
   return applyDecorators(
     ApiResponse({
@@ -18,11 +18,14 @@ export function ApiExceptionDecorator(
       status: statusCode,
       description: description,
       schema: {
-        default: {
-          message: message,
-          date: new Date().toISOString(),
-        },
+        default: [
+          {
+            message: message,
+            date: new Date().toISOString(),
+          },
+        ],
         type: getSchemaPath(ExceptionDto),
+        ...options?.schema,
       },
     }),
   );

@@ -1,6 +1,7 @@
 import { HttpStatus } from '@nestjs/common';
-import { ApiResponseOptions } from '@nestjs/swagger';
+import { ApiResponseSchemaHost } from '@nestjs/swagger';
 import { ApiExceptionDecorator } from './exception.decorator';
+import { ClassValidatorError } from '../pipes/class-validator.pipe';
 
 export enum HttpMessage {
   BadRequest = 'Bad Request',
@@ -8,9 +9,9 @@ export enum HttpMessage {
 }
 
 export interface ApiExceptionParams {
-  message?: string,
+  message?: string | ClassValidatorError[],
   description?: string,
-  options?: ApiResponseOptions
+  options?: ApiResponseSchemaHost
 }
 
 export function ApiBadRequestException({
@@ -18,11 +19,25 @@ export function ApiBadRequestException({
   description = HttpMessage.BadRequest,
   options
 }: ApiExceptionParams = {}) {
-  return ApiExceptionDecorator(
+  options = {
+    ...options,
+    schema: {
+      ...options?.schema,
+      default: [{
+        message: 'Bad request',
+        date: new Date().toISOString(),
+      },
+      {
+        message: [{ property: 'property1', message: 'The property1 is invalid.'}],
+        date: new Date().toISOString(),
+      }]
+    }
+  };
+  return ApiExceptionDecorator<ClassValidatorError>(
     HttpStatus.BAD_REQUEST,
     message,
     description,
-    options,
+    options
   );
 }
 

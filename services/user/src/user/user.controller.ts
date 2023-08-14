@@ -1,15 +1,11 @@
 import { BadRequestException, Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiCreatedResponse } from '@nestjs/swagger';
-import camelcaseKeys from '@cjs-exporter/camelcase-keys';
 
-import { ApiBadRequestException, InternalServerErrorException } from '../common/exceptions';
+import { ApiBadRequestException, InternalServerErrorException } from '../common/swagger';
 import { AuthService } from '../auth/auth.service';
-import { SignInRequest, SignUpRequest } from './user.request';
+import { UserSignUpRequest, UserSignInRequest } from './user.request';
 import { TokenResponse } from './user.response';
 import { UserService } from './user.service';
-
-
-
 
 export interface CurrentUser {
   id: number,
@@ -30,11 +26,10 @@ export class UserController {
 
   @Post('/signup')
   @ApiCreatedResponse({ type: TokenResponse, description: "Sign up successfully." })
-  @ApiBadRequestException({ message: "Invalid sign up inputs." })
+  @ApiBadRequestException()
   @InternalServerErrorException()
-  async signUp(@Body() signUpRequest: SignUpRequest): Promise<TokenResponse> {
-    const { idToken } = signUpRequest;
-    const { email, emailVerified, sub, picture } = camelcaseKeys(this.authService.decodeAuth0Token(idToken));
+  async signUp(@Body() { idToken }: UserSignUpRequest): Promise<TokenResponse> {
+    const { email, emailVerified, sub, picture } = this.authService.decodeAuth0Token(idToken);
 
     if (!emailVerified) {
       throw new BadRequestException('The email is not verified. Please complete the verification step, then sign up again.');
@@ -55,7 +50,8 @@ export class UserController {
   }
 
   @Post('/signin')
-  signIn(@Body() signInRequest: SignInRequest): Boolean {
+  signIn(@Body() { idToken }: UserSignInRequest): Boolean {
+
     return true;
   }
 }
