@@ -5,7 +5,8 @@ import { ClassValidatorError } from '../pipes/class-validator.pipe';
 
 export enum HttpMessage {
   BadRequest = 'Bad Request',
-  InternalServerError = 'Internal Server Error'
+  InternalServerError = 'Internal Server Error',
+  Unauthorized = 'Unauthorized',
 }
 
 export interface ApiExceptionParams {
@@ -41,7 +42,20 @@ export function ApiBadRequestException({
   );
 }
 
-export function InternalServerErrorException({
+export function ApiUnauthorizedException({
+  message = HttpMessage.Unauthorized,
+  description = HttpMessage.Unauthorized,
+  options
+}: ApiExceptionParams = {}) {
+  return ApiExceptionDecorator(
+    HttpStatus.UNAUTHORIZED,
+    message,
+    description,
+    options,
+  );
+}
+
+export function ApiInternalServerErrorException({
   message = HttpMessage.InternalServerError,
   description = HttpMessage.InternalServerError,
   options

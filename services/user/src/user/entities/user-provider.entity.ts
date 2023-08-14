@@ -7,13 +7,21 @@ import {
 
 import { User } from './user.entity';
 
+export enum ProviderEnum {
+  Facebook = 'Facebook',
+  Google = 'Google',
+  Primary = 'Primary'
+}
 @Entity()
 export class UserProvider {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  name: string;
+  @Column({
+    type: 'enum',
+    enum: ProviderEnum
+  })
+  name: ProviderEnum;
 
   @Column()
   picture: string;

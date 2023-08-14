@@ -20,6 +20,12 @@ export class User {
   @Column()
   email: string;
 
+  @Column()
+  password: string;
+
+  @Column()
+  passwordSalt: string;
+
   @OneToMany(() => UserProvider, (provider) => provider.user, { cascade: true })
   providers: UserProvider[];
 

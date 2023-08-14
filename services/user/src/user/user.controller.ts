@@ -1,9 +1,9 @@
-import { BadRequestException, Body, Controller, Get, Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Post, UnauthorizedException } from '@nestjs/common';
 import { ApiCreatedResponse } from '@nestjs/swagger';
 
-import { ApiBadRequestException, InternalServerErrorException } from '../common/swagger';
+import { ApiBadRequestException, ApiUnauthorizedException } from '../common/swagger';
 import { AuthService } from '../auth/auth.service';
-import { UserSignUpRequest, UserSignInRequest } from './user.request';
+import { LoginByIdTokenRequest, LoginRequest, RegisterByIdTokenRequest, RegisterRequest } from './user.request';
 import { TokenResponse } from './user.response';
 import { UserService } from './user.service';
 
@@ -24,11 +24,45 @@ export class UserController {
     return 'user list';
   }
 
-  @Post('/signup')
+  @Post('/register')
+  @ApiBadRequestException()
+  async register(@Body() { email, password }: RegisterRequest): Promise<TokenResponse> {
+    const { id } = await this.userService.createWithPassword({
+      name: email.slice(0, email.indexOf('@')),
+      email,
+      password
+    });
+
+    return {
+      token: this.authService.generateAuthToken({ id, email }, 24 * 60 * 60)
+    };
+  }
+
+  @Post('/login')
+  @ApiBadRequestException()
+  @ApiUnauthorizedException()
+  async login(@Body() { email, password }: LoginRequest): Promise<TokenResponse> {
+    const { id, password: originPassword, passwordSalt } = await this.userService.findOneByEmail(email);
+
+    if (!id) {
+      throw new BadRequestException(`The email ${email} is not found.`);
+    }
+
+    const hashPassword = this.userService.hashPasswordFactory(password, passwordSalt);
+
+    if (hashPassword !== originPassword) {
+      throw new UnauthorizedException('Invalid password.');
+    }
+
+    return {
+      token: this.authService.generateAuthToken({ id, email }, 24 * 60 * 60)
+    };
+  }
+
+  @Post('/register-by-id-token')
   @ApiCreatedResponse({ type: TokenResponse, description: "Sign up successfully." })
   @ApiBadRequestException()
-  @InternalServerErrorException()
-  async signUp(@Body() { idToken }: UserSignUpRequest): Promise<TokenResponse> {
+  async registerByIdToken(@Body() { idToken }: RegisterByIdTokenRequest): Promise<TokenResponse> {
     const { email, emailVerified, sub, picture } = this.authService.decodeAuth0Token(idToken);
 
     if (!emailVerified) {
@@ -49,8 +83,8 @@ export class UserController {
     };
   }
 
-  @Post('/signin')
-  signIn(@Body() { idToken }: UserSignInRequest): Boolean {
+  @Post('/login-by-id-token')
+  loginByIdToken(@Body() { idToken }: LoginByIdTokenRequest): Boolean {
 
     return true;
   }

@@ -9,3 +9,9 @@ export class CreateUserDto {
   providers: ProviderDto[];
 }
 
+export class CreateUserWithPasswordDto {
+  name: string;
+  email: string;
+  password: string;
+}
+
