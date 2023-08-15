@@ -73,7 +73,7 @@ export class UserController {
       name: email.slice(0, email.indexOf('@')),
       email,
       providers: [{
-        name: sub.slice(0, sub.indexOf('|')).toUpperCase(),
+        name: this.userService.transformProvider(sub.slice(0, sub.indexOf('|')).toUpperCase()),
         picture,
       }]
     });

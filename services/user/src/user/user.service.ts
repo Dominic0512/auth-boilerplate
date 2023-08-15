@@ -1,7 +1,7 @@
 import * as crypto from 'crypto';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOneOptions, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 
 import { User } from './entities/user.entity';
 import { ProviderEnum, UserProvider } from './entities/user-provider.entity';
@@ -34,7 +34,7 @@ export class UserService {
   async create({ providers, name, ...rest }: CreateUserDto) {
     const userProviders = providers.map((provider) => {
       const userProvider = new UserProvider();
-      userProvider.name = this.transformProvider(provider.name);
+      userProvider.name = provider.name;
       userProvider.picture = provider.picture ?? this.dummyPictureFactory(name);
       return userProvider;
     });
