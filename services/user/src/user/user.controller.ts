@@ -3,11 +3,10 @@ import { ApiCreatedResponse } from '@nestjs/swagger';
 
 import { ApiBadRequestException, ApiUnauthorizedException } from '../common/swagger';
 import { AuthService } from '../auth/auth.service';
-import { LoginByIdTokenRequest, LoginRequest, RegisterByIdTokenRequest, RegisterRequest, VerifyRequest } from './user.request';
+import { LoginRequest, AuthByIdTokenRequest, RegisterRequest, VerifyRequest } from './user.request';
 import { TokenResponse } from './user.response';
 import { UserService } from './user.service';
 import { User, UserStateEnum } from './entities/user.entity';
-import { ConfigService } from '@nestjs/config';
 
 export interface CurrentUser {
   id: number,
@@ -18,7 +17,6 @@ export interface CurrentUser {
 @Controller('user')
 export class UserController {
   constructor(
-    private readonly configService: ConfigService,
     private authService: AuthService,
     private userService: UserService
   ) {}
@@ -79,17 +77,17 @@ export class UserController {
     };
   }
 
-  @Post('/register-by-id-token')
+  @Post('/auth-by-id-token')
   @ApiCreatedResponse({ type: TokenResponse, description: "Sign up successfully." })
   @ApiBadRequestException()
-  async registerByIdToken(@Body() { idToken }: RegisterByIdTokenRequest): Promise<TokenResponse> {
+  async authByIdToken(@Body() { idToken }: AuthByIdTokenRequest): Promise<TokenResponse> {
     const { email, emailVerified, sub, picture } = this.authService.decodeAuth0Token(idToken);
 
     if (!emailVerified) {
       throw new BadRequestException('The email is not verified. Please complete the verification step, then sign up again.');
     }
 
-    const { id } = await this.userService.create({
+    const user = await this.userService.upsertWithProvider({
       name: email.slice(0, email.indexOf('@')),
       email,
       providers: [{
@@ -99,12 +97,7 @@ export class UserController {
     });
 
     return {
-      token: this.authService.generateAuthToken({ id, email })
+      token: this.authService.generateAuthToken({ id: user.id, email })
     };
-  }
-
-  @Post('/login-by-id-token')
-  loginByIdToken(@Body() { idToken }: LoginByIdTokenRequest): Boolean {
-    return true;
   }
 }

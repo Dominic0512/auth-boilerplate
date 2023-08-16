@@ -18,7 +18,7 @@ export class ProviderDto {
   picture: string;
 }
 
-export class CreateUserDto {
+export class UpsertUserDto {
   @MinLength(1)
   name: string;
 

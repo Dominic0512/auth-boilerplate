@@ -73,7 +73,6 @@ export class AuthService {
   }
 
   generateAuthToken<T extends object>(input: T, options: { aging: number } = { aging: this.jwtAging }) {
-    console.log(options.aging);
     return jwt.sign(input, this.jwtSecret, {
       issuer: this.jwtIssuer,
       expiresIn: Math.floor(Date.now() / 1000) + options.aging

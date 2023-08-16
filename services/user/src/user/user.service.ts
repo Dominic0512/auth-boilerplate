@@ -6,14 +6,14 @@ import { Repository } from 'typeorm';
 
 import { User, UserStateEnum } from './entities/user.entity';
 import { ProviderEnum, UserProvider } from './entities/user-provider.entity';
-import { CreateUserDto, CreateUserWithPasswordDto } from './user.dto';
+import { CreateUserWithPasswordDto, ProviderDto, UpsertUserDto } from './user.dto';
 import { UserRegisterByPasswordEvent } from 'src/common/event/user.event';
-import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(UserProvider) private userProviderRepository: Repository<UserProvider>,
     private eventEmitter: EventEmitter2
   ) {}
 
@@ -35,20 +35,34 @@ export class UserService {
     return ProviderEnum[capitalizeName];
   }
 
-  async create({ providers, name, ...rest }: CreateUserDto) {
-    const userProviders = providers.map((provider) => {
-      const userProvider = new UserProvider();
-      userProvider.name = provider.name;
-      userProvider.picture = provider.picture ?? this.dummyPictureFactory(name);
-      return userProvider;
-    });
+  async upsertWithProvider({ providers, name, email }: UpsertUserDto) {
+    let user = await this.findOneByEmail(email);
 
-    return this.userRepository.save({
-      ...rest,
-      state: UserStateEnum.Verified,
-      name,
-      providers: userProviders
-    });
+    if (!user.id) {
+      user = await this.userRepository.save({
+        name,
+        email,
+        state: UserStateEnum.Verified
+      });
+    }
+
+    await this.upsertNewProvider(user.id, providers[0]);
+
+    if (user.state === UserStateEnum.Pending) {
+      return this.userRepository.save({
+        ...user,
+        state: UserStateEnum.Verified
+      });
+    }
+
+    return user;
+  }
+
+  async upsertNewProvider(userId: number, provider: ProviderDto) {
+    return await this.userProviderRepository.upsert({
+      userId,
+      ...provider,
+    }, ['userId', 'name']);
   }
 
   async createWithPassword({ name, password, token, ...rest }: CreateUserWithPasswordDto) {

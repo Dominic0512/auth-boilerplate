@@ -2,7 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { IsEmail, IsStrongPassword } from "class-validator";
 
 import { passwordRules } from './user.dto';
-import { RegisterByAuth0Request, LoginByAuth0Request } from '../auth/auth.request'
+import { AuthByAuth0Request } from '../auth/auth.request'
 
 export class RegisterRequest  {
   @ApiProperty()
@@ -31,8 +31,7 @@ export class VerifyRequest {
 export class LoginRequest extends RegisterRequest {}
 
 
-export class RegisterByIdTokenRequest extends RegisterByAuth0Request {
+export class AuthByIdTokenRequest extends AuthByAuth0Request {
   @ApiProperty()
   idToken: string;
 }
-export class LoginByIdTokenRequest extends LoginByAuth0Request {}
