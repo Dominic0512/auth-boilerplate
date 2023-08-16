@@ -24,9 +24,6 @@ export class UserController {
   ) {}
   @Get()
   list(): string {
-    console.log(this.configService.get('core'));
-    console.log(this.configService.get('database'));
-    console.log(this.configService.get('mailerSend'));
     return 'user list';
   }
 

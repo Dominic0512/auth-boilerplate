@@ -12,6 +12,7 @@ export default () => {
       username: process.env.DATABASE_USER,
     },
     mailerSend: {
+      domain: process.env.MAILER_SEND_DOMAIN,
       apiKey: process.env.MAILER_SEND_API_KEY
     },
     auth0: {
