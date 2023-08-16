@@ -1,11 +1,15 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { BadRequestException, ValidationPipe } from '@nestjs/common';
-import { ValidationError, useContainer } from 'class-validator';
+import { useContainer } from 'class-validator';
 
 import { AppModule } from './app.module';
-import { HttpExceptionFilter } from './common/filters/http-exception.filter';
-import { ClassValidatorPipe } from './common/pipes/class-validator.pipe'
+import { HttpExceptionFilter } from './common/filter/http-exception.filter';
+import { ClassValidatorPipe } from './common/pipe/class-validator.pipe'
+
+
+import { Catch, ArgumentsHost, InternalServerErrorException, BadRequestException } from '@nestjs/common';
+import { BaseExceptionFilter } from '@nestjs/core';
+import { QueryFailedError } from 'typeorm';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

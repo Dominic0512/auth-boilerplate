@@ -23,6 +23,11 @@ export class RegisterRequest  {
   password: string;
 }
 
+export class VerifyRequest {
+  @ApiProperty()
+  token: string;
+}
+
 export class LoginRequest extends RegisterRequest {}
 
 

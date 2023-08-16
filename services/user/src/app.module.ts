@@ -1,19 +1,21 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { createDatabase } from 'typeorm-extension';
 
-import databaseConfig from './config/database';
+import configuration from './config/configuration';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [databaseConfig],
+      load: [configuration],
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -33,7 +35,9 @@ import { UserModule } from './user/user.module';
         return await new DataSource(options).initialize();
       },
     }),
+    EventEmitterModule.forRoot(),
     UserModule,
+    EmailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

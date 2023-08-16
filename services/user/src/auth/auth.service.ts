@@ -1,5 +1,6 @@
 import camelcaseKeys from '@cjs-exporter/camelcase-keys';
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import * as jwt from 'jsonwebtoken';
 import { JwksClient } from 'jwks-rsa';
 
@@ -28,16 +29,21 @@ export interface Auth0IdTokenPayload {
 @Injectable()
 export class AuthService {
   private publicKey: string;
-  private jwtIssuer: string = 'auth-boilerplate';
+  private jwtIssuer: string;
   private jwtSecret: string;
+  private jwtAging: number;
 
-  constructor() {
-    this.jwtSecret = 'C4F643B276ACDBA165AF2EE61E41D';
+  constructor(
+    private readonly configService: ConfigService
+  ) {
+    this.jwtSecret = this.configService.get<string>('core.jwtSecret');
+    this.jwtIssuer = this.configService.get<string>('core.jwtIssuer');
+    this.jwtAging = this.configService.get<number>('core.jwtAging');
   }
 
   async onModuleInit() {
-    const auth0Domain = 'dev-wp8ohtuqhmro5mwa.us.auth0.com';
-    const auth0Kid = 'jyrIzgfkKE4gl9TiQCaYg';
+    const auth0Domain = this.configService.get<string>('auth0.domain');
+    const auth0Kid = this.configService.get<string>('auth0.kid');
 
     if (!auth0Domain) {
       throw new Error('The domain of Auth0 is not found, please set as an environment variable.');
@@ -66,10 +72,11 @@ export class AuthService {
     return camelcaseKeys(this.decodeToken<Auth0IdTokenPayload>(token));
   }
 
-  generateAuthToken<T extends object>(input: T, aging: number) {
+  generateAuthToken<T extends object>(input: T, options: { aging: number } = { aging: this.jwtAging }) {
+    console.log(options.aging);
     return jwt.sign(input, this.jwtSecret, {
       issuer: this.jwtIssuer,
-      expiresIn: Math.floor(Date.now() / 1000) + aging
+      expiresIn: Math.floor(Date.now() / 1000) + options.aging
     });
   }
 }

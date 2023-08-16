@@ -9,22 +9,34 @@ import {
 
 import { UserProvider } from './user-provider.entity';
 
+export enum UserStateEnum {
+  Pending = 'Pending',
+  Verified = 'Verified',
+}
+
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({
+    type: 'enum',
+    enum: UserStateEnum,
+    default: UserStateEnum.Pending
+  })
+  state: UserStateEnum
+
   @Column()
   name: string;
 
-  @Column()
+  @Column({ unique: true })
   email: string;
 
-  @Column()
-  password: string;
+  @Column({ nullable: true })
+  password?: string;
 
-  @Column()
-  passwordSalt: string;
+  @Column({ nullable: true })
+  passwordSalt?: string;
 
   @OneToMany(() => UserProvider, (provider) => provider.user, { cascade: true })
   providers: UserProvider[];

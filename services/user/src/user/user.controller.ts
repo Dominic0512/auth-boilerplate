@@ -3,9 +3,11 @@ import { ApiCreatedResponse } from '@nestjs/swagger';
 
 import { ApiBadRequestException, ApiUnauthorizedException } from '../common/swagger';
 import { AuthService } from '../auth/auth.service';
-import { LoginByIdTokenRequest, LoginRequest, RegisterByIdTokenRequest, RegisterRequest } from './user.request';
+import { LoginByIdTokenRequest, LoginRequest, RegisterByIdTokenRequest, RegisterRequest, VerifyRequest } from './user.request';
 import { TokenResponse } from './user.response';
 import { UserService } from './user.service';
+import { User, UserStateEnum } from './entities/user.entity';
+import { ConfigService } from '@nestjs/config';
 
 export interface CurrentUser {
   id: number,
@@ -16,25 +18,42 @@ export interface CurrentUser {
 @Controller('user')
 export class UserController {
   constructor(
+    private readonly configService: ConfigService,
     private authService: AuthService,
     private userService: UserService
   ) {}
   @Get()
   list(): string {
+    console.log(this.configService.get('core'));
+    console.log(this.configService.get('database'));
+    console.log(this.configService.get('mailerSend'));
     return 'user list';
   }
 
   @Post('/register')
   @ApiBadRequestException()
-  async register(@Body() { email, password }: RegisterRequest): Promise<TokenResponse> {
-    const { id } = await this.userService.createWithPassword({
+  async register(@Body() { email, password }: RegisterRequest): Promise<Partial<User>> {
+    const user = await this.userService.findOneByEmail(email);
+
+    if (user) {
+      throw new BadRequestException(`The email ${email} is exists.`);
+    }
+
+    return await this.userService.createWithPassword({
       name: email.slice(0, email.indexOf('@')),
       email,
-      password
+      password,
+      token: this.authService.generateAuthToken({ email })
     });
+  }
 
+  @Post('/verify')
+  @ApiUnauthorizedException()
+  async verify(@Body() { token }: VerifyRequest): Promise<TokenResponse> {
+    const { email } = this.authService.decodeToken<{ email: string }>(token);
+    const { id } = await this.userService.verifyByEmail(email);
     return {
-      token: this.authService.generateAuthToken({ id, email }, 24 * 60 * 60)
+      token: this.authService.generateAuthToken({ id, email })
     };
   }
 
@@ -42,10 +61,14 @@ export class UserController {
   @ApiBadRequestException()
   @ApiUnauthorizedException()
   async login(@Body() { email, password }: LoginRequest): Promise<TokenResponse> {
-    const { id, password: originPassword, passwordSalt } = await this.userService.findOneByEmail(email);
+    const { id, state, password: originPassword, passwordSalt } = await this.userService.findOneByEmail(email);
 
     if (!id) {
       throw new BadRequestException(`The email ${email} is not found.`);
+    }
+
+    if (state !== UserStateEnum.Verified) {
+      throw new UnauthorizedException('Please complete the email verify step.');
     }
 
     const hashPassword = this.userService.hashPasswordFactory(password, passwordSalt);
@@ -55,7 +78,7 @@ export class UserController {
     }
 
     return {
-      token: this.authService.generateAuthToken({ id, email }, 24 * 60 * 60)
+      token: this.authService.generateAuthToken({ id, email })
     };
   }
 
@@ -79,13 +102,12 @@ export class UserController {
     });
 
     return {
-      token: this.authService.generateAuthToken({ id, email }, 24 * 60 * 60)
+      token: this.authService.generateAuthToken({ id, email })
     };
   }
 
   @Post('/login-by-id-token')
   loginByIdToken(@Body() { idToken }: LoginByIdTokenRequest): Boolean {
-
     return true;
   }
 }

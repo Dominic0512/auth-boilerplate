@@ -1,12 +1,12 @@
 import { HttpStatus } from '@nestjs/common';
 import { ApiResponseSchemaHost } from '@nestjs/swagger';
 import { ApiExceptionDecorator } from './exception.decorator';
-import { ClassValidatorError } from '../pipes/class-validator.pipe';
+import { ClassValidatorError } from '../pipe/class-validator.pipe';
 
 export enum HttpMessage {
   BadRequest = 'Bad Request',
-  InternalServerError = 'Internal Server Error',
   Unauthorized = 'Unauthorized',
+  InternalServerError = 'Internal Server Error',
 }
 
 export interface ApiExceptionParams {
@@ -25,7 +25,7 @@ export function ApiBadRequestException({
     schema: {
       ...options?.schema,
       default: [{
-        message: 'Bad request',
+        message: HttpMessage.BadRequest,
         date: new Date().toISOString(),
       },
       {

@@ -1,4 +1,4 @@
-import { ArrayNotEmpty, IsEmail, IsEnum, IsStrongPassword, IsUrl, MinLength } from 'class-validator';
+import { ArrayNotEmpty, IsEmail, IsEnum, IsJWT, IsStrongPassword, IsUrl, MinLength } from 'class-validator';
 
 import { ProviderEnum } from './entities/user-provider.entity';
 
@@ -38,5 +38,8 @@ export class CreateUserWithPasswordDto {
 
   @IsStrongPassword(passwordRules)
   password: string;
+
+  @IsJWT()
+  token: string;
 }
 

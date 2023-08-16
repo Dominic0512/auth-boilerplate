@@ -1,8 +1,8 @@
 import {
   Entity,
   Column,
-  PrimaryGeneratedColumn,
-  ManyToOne
+  ManyToOne,
+  PrimaryColumn
 } from 'typeorm';
 
 import { User } from './user.entity';
@@ -14,13 +14,11 @@ export enum ProviderEnum {
 }
 @Entity()
 export class UserProvider {
-  @PrimaryGeneratedColumn()
-  id: number;
-
   @Column({
     type: 'enum',
-    enum: ProviderEnum
+    enum: ProviderEnum,
   })
+  @PrimaryColumn()
   name: ProviderEnum;
 
   @Column()
@@ -28,4 +26,7 @@ export class UserProvider {
 
   @ManyToOne(() => User, (user) => user.providers)
   user: User;
+
+  @PrimaryColumn()
+  userId: number;
 }
