@@ -26,12 +26,20 @@ export interface Auth0IdTokenPayload {
   nonce: string;
 }
 
+export type Auth0TransformPayload = Pick<
+  Auth0IdTokenPayload, 'name' | 'picture' | 'email' | 'emailVerified'
+> & { provider: string };
+
 @Injectable()
 export class AuthService {
   private publicKey: string;
   private jwtIssuer: string;
   private jwtSecret: string;
   private jwtAging: number;
+  private providerMap: { [key: string]: string } = {
+    'facebook': 'facebook',
+    'google-oauth2': 'google'
+  };
 
   constructor(
     private readonly configService: ConfigService
@@ -54,7 +62,7 @@ export class AuthService {
 
   verifyToken(token: string, secret: string) {
     try {
-      jwt.verify(token, this.jwtSecret);
+      jwt.verify(token, secret);
       return { success: true };
     } catch(e) {
       return {
@@ -76,8 +84,22 @@ export class AuthService {
     return jwt.decode(token) as T;
   }
 
-  decodeAuth0Token(token: string): Auth0IdTokenPayload {
-    return camelcaseKeys(this.decodeToken<Auth0IdTokenPayload>(token));
+  decodeAuth0Token(token: string): Auth0TransformPayload {
+    const {
+      name,
+      picture,
+      email,
+      emailVerified,
+      sub
+    }: Auth0IdTokenPayload = camelcaseKeys(this.decodeToken(token));
+
+    return {
+      name,
+      picture,
+      email,
+      emailVerified,
+      provider: this.providerMap[sub.slice(0, sub.indexOf('|'))]
+    };
   }
 
   generateAuthToken<T extends object>(input: T, options: { aging: number } = { aging: this.jwtAging }) {

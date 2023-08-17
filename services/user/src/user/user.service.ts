@@ -38,7 +38,7 @@ export class UserService {
   async upsertWithProvider({ providers, name, email }: UpsertUserDto) {
     let user = await this.findOneByEmail(email);
 
-    if (!user.id) {
+    if (!user) {
       user = await this.userRepository.save({
         name,
         email,
