@@ -65,7 +65,7 @@ export class UserService {
     }, ['userId', 'name']);
   }
 
-  async createWithPassword({ name, password, token, ...rest }: CreateUserWithPasswordDto) {
+  async createWithPassword({ name, password, verifyToken, ...rest }: CreateUserWithPasswordDto) {
     const passwordSalt = this.passwordSaltFactory();
 
     const user = await this.userRepository.save({
@@ -84,7 +84,7 @@ export class UserService {
       new UserRegisterByPasswordEvent({
         name: name,
         email: user.email,
-        link: `http://localhost:10001/api/user/verify?token=${token}`
+        link: `http://localhost:10001/api/user/verify?token=${verifyToken}`
       }),
     );
 

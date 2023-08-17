@@ -40,6 +40,6 @@ export class CreateUserWithPasswordDto {
   password: string;
 
   @IsJWT()
-  token: string;
+  verifyToken: string;
 }
 

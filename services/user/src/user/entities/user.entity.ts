@@ -6,6 +6,7 @@ import {
   OneToMany,
   UpdateDateColumn,
 } from 'typeorm';
+import { Exclude } from 'class-transformer';
 
 import { UserProvider } from './user-provider.entity';
 
@@ -16,6 +17,10 @@ export enum UserStateEnum {
 
 @Entity()
 export class User {
+  constructor(partial: Partial<User>) {
+    Object.assign(this, partial);
+  }
+
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -33,9 +38,11 @@ export class User {
   email: string;
 
   @Column({ nullable: true })
+  @Exclude()
   password?: string;
 
   @Column({ nullable: true })
+  @Exclude()
   passwordSalt?: string;
 
   @OneToMany(() => UserProvider, (provider) => provider.user, { cascade: true })

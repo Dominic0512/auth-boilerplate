@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Post, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Body, ClassSerializerInterceptor, Controller, Get, Post, UnauthorizedException, UseInterceptors } from '@nestjs/common';
 import { ApiCreatedResponse } from '@nestjs/swagger';
 
 import { ApiBadRequestException, ApiUnauthorizedException } from '../common/swagger';
@@ -26,20 +26,21 @@ export class UserController {
   }
 
   @Post('/register')
+  @UseInterceptors(ClassSerializerInterceptor)
   @ApiBadRequestException()
-  async register(@Body() { email, password }: RegisterRequest): Promise<Partial<User>> {
+  async register(@Body() { email, password }: RegisterRequest): Promise<User> {
     const user = await this.userService.findOneByEmail(email);
 
     if (user) {
       throw new BadRequestException(`The email ${email} is exists.`);
     }
 
-    return await this.userService.createWithPassword({
+    return new User(await this.userService.createWithPassword({
       name: email.slice(0, email.indexOf('@')),
       email,
       password,
-      token: this.authService.generateAuthToken({ email })
-    });
+      verifyToken: this.authService.generateAuthToken({ email })
+    }));
   }
 
   @Post('/verify')
