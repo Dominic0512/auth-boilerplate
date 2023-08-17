@@ -91,6 +91,10 @@ export class UserService {
     return user;
   }
 
+  async findOneById(id: number) {
+    return await this.userRepository.findOneBy({ id });
+  }
+
   async findOneByEmail(email: string) {
     return await this.userRepository.findOneBy({ email });
   }

@@ -7,9 +7,6 @@ import { HttpExceptionFilter } from './common/filter/http-exception.filter';
 import { ClassValidatorPipe } from './common/pipe/class-validator.pipe'
 
 
-import { Catch, ArgumentsHost, InternalServerErrorException, BadRequestException } from '@nestjs/common';
-import { BaseExceptionFilter } from '@nestjs/core';
-import { QueryFailedError } from 'typeorm';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -20,6 +17,14 @@ async function bootstrap() {
     .setTitle('User service document')
     .setDescription('The user API description')
     .setVersion('1.0')
+    .addBearerAuth({
+      description: `Please enter token in following format: Bearer <JWT>`,
+      name: 'Authorization',
+      bearerFormat: 'Bearer',
+      scheme: 'Bearer',
+      type: 'http',
+      in: 'Header'
+    })
     .addTag('user')
     .build();
   const document = SwaggerModule.createDocument(app, config);

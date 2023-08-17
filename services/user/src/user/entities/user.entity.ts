@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 
+import { RoleEnum as UserRoleEnum } from 'src/auth/auth.type';
 import { UserProvider } from './user-provider.entity';
 
 export enum UserStateEnum {
@@ -29,7 +30,14 @@ export class User {
     enum: UserStateEnum,
     default: UserStateEnum.Pending
   })
-  state: UserStateEnum
+  state: UserStateEnum;
+
+  @Column({
+    type: 'enum',
+    enum: UserRoleEnum,
+    default: UserRoleEnum.User
+  })
+  role: UserRoleEnum;
 
   @Column()
   name: string;

@@ -52,9 +52,9 @@ export class AuthService {
     this.publicKey = (await jwksClient.getSigningKey(auth0Kid)).getPublicKey();
   }
 
-  verifyAuth0Token(token: string) {
+  verifyToken(token: string, secret: string) {
     try {
-      jwt.verify(token, this.publicKey);
+      jwt.verify(token, this.jwtSecret);
       return { success: true };
     } catch(e) {
       return {
@@ -62,6 +62,14 @@ export class AuthService {
         message: e.message
       };
     }
+  }
+
+  verifyAuth0Token(token: string) {
+    return this.verifyToken(token, this.publicKey);
+  }
+
+  verifyPrimaryAuthToken(token: string) {
+    return this.verifyToken(token, this.jwtSecret);
   }
 
   decodeToken<T = any>(token: string) {

@@ -1,18 +1,25 @@
-import { BadRequestException, Body, ClassSerializerInterceptor, Controller, Get, Post, UnauthorizedException, UseInterceptors } from '@nestjs/common';
+import {
+  BadRequestException,
+  Request,
+  Body,
+  ClassSerializerInterceptor,
+  Controller,
+  Get,
+  Post,
+  UnauthorizedException,
+  UseInterceptors,
+} from '@nestjs/common';
 import { ApiCreatedResponse } from '@nestjs/swagger';
 
-import { ApiBadRequestException, ApiUnauthorizedException } from '../common/swagger';
+import { ApiBadRequestException, ApiForbiddenResourceException, ApiUnauthorizedException } from '../common/swagger';
 import { AuthService } from '../auth/auth.service';
+import { RequestWithCurrentUser } from '../auth/auth.middleware';
+import { ApiBearAuthWithRoles, Roles } from '../auth/auth.decorator';
+import { RoleEnum } from '../auth/auth.type';
 import { LoginRequest, AuthByIdTokenRequest, RegisterRequest, VerifyRequest } from './user.request';
 import { TokenResponse } from './user.response';
 import { UserService } from './user.service';
 import { User, UserStateEnum } from './entities/user.entity';
-
-export interface CurrentUser {
-  id: number,
-  email: string,
-  isRevoke?: boolean,
-}
 
 @Controller('user')
 export class UserController {
@@ -47,9 +54,9 @@ export class UserController {
   @ApiUnauthorizedException()
   async verify(@Body() { token }: VerifyRequest): Promise<TokenResponse> {
     const { email } = this.authService.decodeToken<{ email: string }>(token);
-    const { id } = await this.userService.verifyByEmail(email);
+    const { id, role} = await this.userService.verifyByEmail(email);
     return {
-      token: this.authService.generateAuthToken({ id, email })
+      token: this.authService.generateAuthToken({ id, email, role })
     };
   }
 
@@ -57,7 +64,7 @@ export class UserController {
   @ApiBadRequestException()
   @ApiUnauthorizedException()
   async login(@Body() { email, password }: LoginRequest): Promise<TokenResponse> {
-    const { id, state, password: originPassword, passwordSalt } = await this.userService.findOneByEmail(email);
+    const { id, state, password: originPassword, passwordSalt, role } = await this.userService.findOneByEmail(email);
 
     if (!id) {
       throw new BadRequestException(`The email ${email} is not found.`);
@@ -74,7 +81,7 @@ export class UserController {
     }
 
     return {
-      token: this.authService.generateAuthToken({ id, email })
+      token: this.authService.generateAuthToken({ id, email, role })
     };
   }
 
@@ -98,7 +105,17 @@ export class UserController {
     });
 
     return {
-      token: this.authService.generateAuthToken({ id: user.id, email })
+      token: this.authService.generateAuthToken({ id: user.id, email, role: user.role })
     };
+  }
+
+  @Get('/profile')
+  @UseInterceptors(ClassSerializerInterceptor)
+  @ApiBearAuthWithRoles([RoleEnum.User, RoleEnum.Admin])
+  @ApiUnauthorizedException()
+  @ApiForbiddenResourceException()
+  async profile(@Request() req: RequestWithCurrentUser) {
+    const { id } = req.currentUser;
+    return new User(await this.userService.findOneById(id));
   }
 }
