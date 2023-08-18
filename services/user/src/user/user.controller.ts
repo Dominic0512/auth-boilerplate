@@ -14,9 +14,9 @@ import { ApiCreatedResponse } from '@nestjs/swagger';
 import { ApiBadRequestException, ApiForbiddenResourceException, ApiUnauthorizedException } from '../common/swagger';
 import { AuthService } from '../auth/auth.service';
 import { RequestWithCurrentUser } from '../auth/auth.middleware';
-import { ApiBearAuthWithRoles, Roles } from '../auth/auth.decorator';
+import { ApiBearAuthWithRoles } from '../auth/auth.decorator';
 import { RoleEnum } from '../auth/auth.type';
-import { LoginRequest, AuthByIdTokenRequest, RegisterRequest, VerifyRequest } from './user.request';
+import { LoginRequest, AuthByIdTokenRequest, RegisterRequest, VerifyRequest, ResetPasswordRequest } from './user.request';
 import { TokenResponse } from './user.response';
 import { UserService } from './user.service';
 import { User, UserStateEnum } from './entities/user.entity';
@@ -117,5 +117,23 @@ export class UserController {
   async profile(@Request() req: RequestWithCurrentUser) {
     const { id } = req.currentUser;
     return new User(await this.userService.findOneById(id));
+  }
+
+  @Post('/reset-password')
+  @UseInterceptors(ClassSerializerInterceptor)
+  @ApiBearAuthWithRoles([RoleEnum.User, RoleEnum.Admin])
+  @ApiUnauthorizedException()
+  @ApiBadRequestException()
+  async resetPassword(@Request() req: RequestWithCurrentUser, @Body() resetPasswordRequest: ResetPasswordRequest) {
+    const { id } = req.currentUser;
+    const { password, passwordSalt} = await this.userService.findOneById(id);
+    const { oldPassword, newPassword } = resetPasswordRequest;
+    const hashPassword = this.userService.hashPasswordFactory(oldPassword, passwordSalt);
+
+    if (hashPassword !== password) {
+      throw new UnauthorizedException('Invalid old password.');
+    }
+
+    return new User(await this.userService.updatePasswordById(id, newPassword));
   }
 }

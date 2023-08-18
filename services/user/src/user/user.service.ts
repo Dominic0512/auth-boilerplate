@@ -21,12 +21,16 @@ export class UserService {
     return `https://i0.wp.com/cdn.auth0.com/avatars/${name.slice(0,2)}.png?ssl=1`;
   }
 
-  passwordSaltFactory() {
-    return crypto.randomBytes(16).toString('base64');
-  }
-
   hashPasswordFactory(password: string, salt: string) {
     return crypto.createHmac('sha256', salt).update(password).digest('base64');
+  }
+
+  hashPasswordPairFactory(password: string) {
+    const salt = crypto.randomBytes(16).toString('base64');
+    return {
+      password: this.hashPasswordFactory(password, salt),
+      passwordSalt: salt
+    };
   }
 
   transformProvider(name: string) {
@@ -66,13 +70,10 @@ export class UserService {
   }
 
   async createWithPassword({ name, password, verifyToken, ...rest }: CreateUserWithPasswordDto) {
-    const passwordSalt = this.passwordSaltFactory();
-
     const user = await this.userRepository.save({
       ...rest,
       name,
-      password: this.hashPasswordFactory(password, passwordSalt),
-      passwordSalt,
+      ...this.hashPasswordPairFactory(password),
       providers: [{
         name: ProviderEnum.Primary,
         picture: this.dummyPictureFactory(name),
@@ -103,5 +104,16 @@ export class UserService {
     const user = await this.findOneByEmail(email);
     user.state = UserStateEnum.Verified;
     return this.userRepository.save(user);
+  }
+
+  async updatePasswordById(id: number, password: string) {
+    const user = await this.findOneById(id);
+
+    return this.userRepository.save(
+      {
+        ...user,
+        ...this.hashPasswordPairFactory(password)
+      },
+    );
   }
 }

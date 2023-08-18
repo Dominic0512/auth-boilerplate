@@ -18,7 +18,6 @@ export class RolesGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest();
     const currentUser: CurrentUser = request['currentUser'];
-    console.log(currentUser);
 
     if (!currentUser) {
       throw new UnauthorizedException('Invalid token.');
