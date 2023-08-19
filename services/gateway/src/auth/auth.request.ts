@@ -1,8 +1,11 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsEmail, IsStrongPassword } from "class-validator";
+import { IsValidAuth0Token } from "./auth.validator";
 
-import { passwordRules } from './user.dto';
-import { AuthByAuth0Request } from '../auth/auth.request'
+export class AuthByAuth0Request {
+  @IsValidAuth0Token()
+  idToken: string;
+}
 
 // TODO: Improve error message for IsStrongPassword validator.
 const passwordDescription =  `
@@ -13,6 +16,15 @@ const passwordDescription =  `
   - contains at least one special character \n
   - contains at least 8 characters
 `;
+
+// TODO: Let it be shared between uth and user service.
+export const passwordRules = {
+  minLowercase: 1,
+  minUppercase: 1,
+  minNumbers: 1,
+  minSymbols: 1,
+  minLength: 8,
+}
 
 export class RegisterRequest  {
   @ApiProperty()

@@ -1,9 +1,8 @@
 export default () => {
   return {
     core: {
-      jwtSecret: process.env.CORE_JWT_SECRET,
-      jwtIssuer: process.env.CORE_JWT_ISSUER,
-      jwtAging: eval(process.env.CORE_JWT_AGING),
+      host: process.env.USER_HOST,
+      port: Number(process.env.USER_PORT),
     },
     database: {
       host: process.env.DATABASE_HOST,

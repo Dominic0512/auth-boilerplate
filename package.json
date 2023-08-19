@@ -10,7 +10,7 @@
     "sites/*"
   ],
   "devDependencies": {
-    "lerna": "^7.0.2",
-    "nx": "^16.6.0"
+    "lerna": "^7.1.5",
+    "nx": "^16.7.2"
   }
 }

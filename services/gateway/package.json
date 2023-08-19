@@ -21,13 +21,23 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@cjs-exporter/camelcase-keys": "^8.0.2",
     "@nestjs/common": "^9.0.0",
+    "@nestjs/config": "^3.0.0",
     "@nestjs/core": "^9.0.0",
+    "@nestjs/microservices": "^9.0.0",
     "@nestjs/platform-express": "^9.0.0",
+    "@nestjs/swagger": "^7.1.8",
+    "@types/jsonwebtoken": "^9.0.2",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.0",
     "http-proxy-middleware": "^2.0.6",
+    "jsonwebtoken": "^9.0.1",
+    "jwks-rsa": "^3.0.1",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
-    "rxjs": "^7.2.0"
+    "rxjs": "^7.2.0",
+    "user": "workspace:^"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",
@@ -71,5 +81,14 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
+  },
+  "nx": {
+    "targets": {
+      "start:dev": {
+        "configurations": {
+          "development": {}
+        }
+      }
+    }
   }
 }

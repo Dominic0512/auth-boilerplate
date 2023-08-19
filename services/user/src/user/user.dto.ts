@@ -39,7 +39,17 @@ export class CreateUserWithPasswordDto {
   @IsStrongPassword(passwordRules)
   password: string;
 
+  passwordSalt: string;
+
   @IsJWT()
   verifyToken: string;
+}
+
+export class ResetUserPasswordDto {
+  id: number;
+
+  oldHashPassword: string;
+
+  newHashPassword: string;
 }
 

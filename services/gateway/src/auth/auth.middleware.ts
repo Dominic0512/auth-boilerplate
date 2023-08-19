@@ -3,7 +3,9 @@ import { NextFunction, Request, Response } from "express";
 import { AuthService } from "./auth.service";
 import { CurrentUser } from "./auth.type";
 
-export type RequestWithCurrentUser = Request & { currentUser: CurrentUser};
+export interface RequestWithCurrentUser extends Request {
+  currentUser: CurrentUser
+}
 
 @Injectable()
 export class JWTMiddleware implements NestMiddleware {

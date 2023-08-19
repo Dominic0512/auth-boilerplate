@@ -1,4 +1,3 @@
-import * as crypto from 'crypto';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EventEmitter2 } from '@nestjs/event-emitter';
@@ -21,19 +20,7 @@ export class UserService {
     return `https://i0.wp.com/cdn.auth0.com/avatars/${name.slice(0,2)}.png?ssl=1`;
   }
 
-  hashPasswordFactory(password: string, salt: string) {
-    return crypto.createHmac('sha256', salt).update(password).digest('base64');
-  }
-
-  hashPasswordPairFactory(password: string) {
-    const salt = crypto.randomBytes(16).toString('base64');
-    return {
-      password: this.hashPasswordFactory(password, salt),
-      passwordSalt: salt
-    };
-  }
-
-  transformProvider(name: string) {
+  transformProviderName(name: string) {
     const lowerName = name.toLowerCase();
     const capitalizeName = lowerName.charAt(0).toUpperCase() + lowerName.slice(1);
     return ProviderEnum[capitalizeName];
@@ -73,7 +60,6 @@ export class UserService {
     const user = await this.userRepository.save({
       ...rest,
       name,
-      ...this.hashPasswordPairFactory(password),
       providers: [{
         name: ProviderEnum.Primary,
         picture: this.dummyPictureFactory(name),
@@ -112,7 +98,7 @@ export class UserService {
     return this.userRepository.save(
       {
         ...user,
-        ...this.hashPasswordPairFactory(password)
+        password,
       },
     );
   }

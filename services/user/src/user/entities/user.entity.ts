@@ -8,8 +8,12 @@ import {
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 
-import { RoleEnum as UserRoleEnum } from 'src/auth/auth.type';
 import { UserProvider } from './user-provider.entity';
+
+export enum UserRoleEnum {
+  User = 'User',
+  Admin = 'Admin'
+}
 
 export enum UserStateEnum {
   Pending = 'Pending',

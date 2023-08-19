@@ -1,7 +1,9 @@
-import camelcaseKeys from '@cjs-exporter/camelcase-keys';
+
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import camelcaseKeys from '@cjs-exporter/camelcase-keys';
 import * as jwt from 'jsonwebtoken';
+import * as crypto from 'crypto';
 import { JwksClient } from 'jwks-rsa';
 
 /*
@@ -107,5 +109,17 @@ export class AuthService {
       issuer: this.jwtIssuer,
       expiresIn: Math.floor(Date.now() / 1000) + options.aging
     });
+  }
+
+  hashPasswordFactory(password: string, salt: string) {
+    return crypto.createHmac('sha256', salt).update(password).digest('base64');
+  }
+
+  hashPasswordPairFactory(password: string) {
+    const salt = crypto.randomBytes(16).toString('base64');
+    return {
+      password: this.hashPasswordFactory(password, salt),
+      passwordSalt: salt
+    };
   }
 }
