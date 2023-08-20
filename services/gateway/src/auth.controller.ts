@@ -57,7 +57,7 @@ export class AuthController {
   @ApiUnauthorizedException()
   async verify(@Body() { token }: VerifyRequest): Promise<TokenResponse> {
     const { email } = this.authService.decodeToken<{ email: string }>(token);
-    const { id, role } = await firstValueFrom(this.userServiceClient.send('USER_GET_BY_EMAIL', { email }));
+    const { id, role } = await firstValueFrom(this.userServiceClient.send('USER_VERIFY_BY_EMAIL', { email }));
     return {
       token: this.authService.generateAuthToken({ id, email, role })
     };

@@ -1,16 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { ConfigService } from '@nestjs/config';
 import { Repository } from 'typeorm';
 
 import { User, UserStateEnum } from './entities/user.entity';
 import { ProviderEnum, UserProvider } from './entities/user-provider.entity';
 import { CreateUserWithPasswordDto, ProviderDto, UpsertUserDto } from './user.dto';
-import { UserRegisterByPasswordEvent } from 'src/common/event/user.event';
+import { UserRegisterByPasswordEvent } from '../common/event/user.event';
 
 @Injectable()
 export class UserService {
   constructor(
+    private readonly configService: ConfigService,
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(UserProvider) private userProviderRepository: Repository<UserProvider>,
     private eventEmitter: EventEmitter2
@@ -71,7 +73,7 @@ export class UserService {
       new UserRegisterByPasswordEvent({
         name: name,
         email: user.email,
-        link: `http://localhost:10001/api/user/verify?token=${verifyToken}`
+        link: `${this.configService.get('core.emailVerifyEndpoint')}?token=${verifyToken}`
       }),
     );
 

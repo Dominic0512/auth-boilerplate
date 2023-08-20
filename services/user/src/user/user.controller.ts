@@ -29,6 +29,11 @@ export class UserController {
     return await this.userService.createWithPassword(createUserWithPassword);
   }
 
+  @MessagePattern('USER_VERIFY_BY_EMAIL')
+  async verifyByEmail(@Payload() { email }: { email: string }) {
+    return await this.userService.verifyByEmail(email);
+  }
+
   @MessagePattern('USER_UPSERT_WITH_PROVIDER')
   async upsertWithProvider(@Payload() upsertUserDto: UpsertUserDto) {
     const { providers } = upsertUserDto;

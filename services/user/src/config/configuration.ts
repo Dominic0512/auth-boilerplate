@@ -3,6 +3,7 @@ export default () => {
     core: {
       host: process.env.USER_HOST,
       port: Number(process.env.USER_PORT),
+      emailVerifyEndpoint: process.env.EMAIL_VERIFY_ENDPOINT,
     },
     database: {
       host: process.env.DATABASE_HOST,
