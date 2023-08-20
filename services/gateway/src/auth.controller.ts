@@ -94,11 +94,7 @@ export class AuthController {
   @ApiCreatedResponse({ type: TokenResponse, description: "Sign up successfully." })
   @ApiBadRequestException()
   async authByIdToken(@Body() { idToken }: AuthByIdTokenRequest): Promise<TokenResponse> {
-    const { email, emailVerified, provider, picture, name } = this.authService.decodeAuth0Token(idToken);
-
-    if (!emailVerified) {
-      throw new BadRequestException('The email is not verified. Please complete the verification step, then sign up again.');
-    }
+    const { email, provider, picture, name } = this.authService.decodeAuth0Token(idToken);
 
     const user = await firstValueFrom(this.userServiceClient.send('USER_UPSERT_WITH_PROVIDER', {
       name,
