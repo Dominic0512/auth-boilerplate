@@ -5,6 +5,7 @@ import camelcaseKeys from '@cjs-exporter/camelcase-keys';
 import * as jwt from 'jsonwebtoken';
 import * as crypto from 'crypto';
 import { JwksClient } from 'jwks-rsa';
+import { AccessTokenPayload, GenerateTokenOptions, RefreshTokenPayload } from './auth.type';
 
 /*
  * NOTE: To get a sample id token please refer to link format below:
@@ -34,10 +35,12 @@ export type Auth0TransformPayload = Pick<
 
 @Injectable()
 export class AuthService {
-  private publicKey: string;
+  private auth0PublicKey: string;
   private jwtIssuer: string;
-  private jwtSecret: string;
-  private jwtAging: number;
+  private accessTokenSecret: string;
+  private accessTokenAging: number;
+  private refreshTokenSecret: string;
+  private refreshTokenAging: number;
   private providerMap: { [key: string]: string } = {
     'facebook': 'facebook',
     'google-oauth2': 'google'
@@ -46,9 +49,11 @@ export class AuthService {
   constructor(
     private readonly configService: ConfigService
   ) {
-    this.jwtSecret = this.configService.get<string>('core.jwtSecret');
     this.jwtIssuer = this.configService.get<string>('core.jwtIssuer');
-    this.jwtAging = this.configService.get<number>('core.jwtAging');
+    this.accessTokenSecret = this.configService.get<string>('core.accessTokenSecret');
+    this.accessTokenAging = this.configService.get<number>('core.accessTokenAging');
+    this.refreshTokenSecret = this.configService.get<string>('core.refreshTokenSecret');
+    this.refreshTokenAging = this.configService.get<number>('core.refreshTokenAging');
   }
 
   async onModuleInit() {
@@ -59,7 +64,7 @@ export class AuthService {
       throw new Error('The domain of Auth0 is not found, please set as an environment variable.');
     }
     const jwksClient = new JwksClient({ jwksUri: `https://${auth0Domain}/.well-known/jwks.json` });
-    this.publicKey = (await jwksClient.getSigningKey(auth0Kid)).getPublicKey();
+    this.auth0PublicKey = (await jwksClient.getSigningKey(auth0Kid)).getPublicKey();
   }
 
   verifyToken(token: string, secret: string) {
@@ -75,11 +80,15 @@ export class AuthService {
   }
 
   verifyAuth0Token(token: string) {
-    return this.verifyToken(token, this.publicKey);
+    return this.verifyToken(token, this.auth0PublicKey);
   }
 
-  verifyPrimaryAuthToken(token: string) {
-    return this.verifyToken(token, this.jwtSecret);
+  verifyPrimaryAccessToken(token: string) {
+    return this.verifyToken(token, this.accessTokenSecret);
+  }
+
+  verifyPrimaryRefreshToken(token: string) {
+    return this.verifyToken(token, this.refreshTokenSecret);
   }
 
   decodeToken<T = any>(token: string) {
@@ -104,11 +113,25 @@ export class AuthService {
     };
   }
 
-  generateAuthToken<T extends object>(input: T, options: { aging: number } = { aging: this.jwtAging }) {
-    return jwt.sign(input, this.jwtSecret, {
+  generateToken<T extends object>(
+    payload: T,
+    options?: GenerateTokenOptions
+  ) {
+    const aging = options.aging ?? this.accessTokenAging;
+    const secret = options.secret ?? this.accessTokenSecret;
+
+    return jwt.sign(payload, secret, {
       issuer: this.jwtIssuer,
-      expiresIn: Math.floor(Date.now() / 1000) + options.aging
+      expiresIn: aging
     });
+  }
+
+  generateAccessToken(payload: AccessTokenPayload) {
+    return this.generateToken<AccessTokenPayload>(payload);
+  }
+
+  generateRefreshToken(payload: RefreshTokenPayload) {
+    return this.generateToken<RefreshTokenPayload>(payload, { aging: this.refreshTokenAging, secret: this.refreshTokenSecret });
   }
 
   hashPasswordFactory(password: string, salt: string) {

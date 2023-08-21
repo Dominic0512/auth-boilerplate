@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
-import {  ApiForbiddenResourceException, ApiUnauthorizedException } from './common/swagger';
+import { ApiForbiddenException, ApiUnauthorizedException } from './common/swagger';
 import { ApiBearAuthWithRoles } from './auth/auth.decorator';
 import { RoleEnum } from './auth/auth.type';
 import { ClientProxy } from '@nestjs/microservices';
@@ -31,7 +31,7 @@ export class UserController {
   @UseInterceptors(ClassSerializerInterceptor)
   @ApiBearAuthWithRoles([RoleEnum.Admin])
   @ApiUnauthorizedException()
-  @ApiForbiddenResourceException()
+  @ApiForbiddenException()
   async profile(@Param() { id }: ManipulateUserDto) {
     return await firstValueFrom(this.userServiceClient.send('USER_GET_BY_ID', { id }));
   }

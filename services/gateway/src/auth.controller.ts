@@ -1,26 +1,28 @@
 import {
   BadRequestException,
-  Request,
   Body,
-  ClassSerializerInterceptor,
   Controller,
   Post,
   UnauthorizedException,
   UseInterceptors,
   Inject,
   Get,
+  Req,
+  ForbiddenException,
 } from '@nestjs/common';
-import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
+import { Request } from 'express';
 
-import { ApiBadRequestException, ApiForbiddenResourceException, ApiUnauthorizedException } from './common/swagger';
+import { ApiBadRequestException, ApiForbiddenException, ApiUnauthorizedException } from './common/swagger';
 import { AuthService } from './auth/auth.service';
 import { RequestWithCurrentUser } from './auth/auth.middleware';
 import { ApiBearAuthWithRoles } from './auth/auth.decorator';
-import { RoleEnum } from './auth/auth.type';
+import { EmailVerificationTokenPayload, RefreshTokenPayload, RoleEnum } from './auth/auth.type';
 import { TokenResponse } from './auth/auth.response';
 import { LoginRequest, AuthByIdTokenRequest, RegisterRequest, VerifyRequest, ResetPasswordRequest } from './auth/auth.request';
+import { AuthInterceptor } from './auth/auth.interceptor';
 
 export enum UserStateEnum {
   Pending = 'Pending',
@@ -29,6 +31,7 @@ export enum UserStateEnum {
 
 @ApiTags('auth')
 @Controller()
+@UseInterceptors(AuthInterceptor)
 export class AuthController {
   constructor(
     private authService: AuthService,
@@ -36,7 +39,6 @@ export class AuthController {
   ) {}
 
   @Post('/register')
-  @UseInterceptors(ClassSerializerInterceptor)
   @ApiBadRequestException()
   async register(@Body() { email, password }: RegisterRequest): Promise<any> {
     const user = await firstValueFrom(this.userServiceClient.send('USER_GET_BY_EMAIL', { email }));
@@ -49,7 +51,7 @@ export class AuthController {
       name: email.slice(0, email.indexOf('@')),
       email,
       ...this.authService.hashPasswordPairFactory(password),
-      verifyToken: this.authService.generateAuthToken({ email })
+      verifyToken: this.authService.generateToken<EmailVerificationTokenPayload>({ email })
     }));
   }
 
@@ -59,7 +61,8 @@ export class AuthController {
     const { email } = this.authService.decodeToken<{ email: string }>(token);
     const { id, role } = await firstValueFrom(this.userServiceClient.send('USER_VERIFY_BY_EMAIL', { email }));
     return {
-      token: this.authService.generateAuthToken({ id, email, role })
+      accessToken: this.authService.generateAccessToken({ id, role }),
+      refreshToken: this.authService.generateRefreshToken({ id })
     };
   }
 
@@ -86,7 +89,8 @@ export class AuthController {
     }
 
     return {
-      token: this.authService.generateAuthToken({ id, email, role })
+      accessToken: this.authService.generateAccessToken({ id, role }),
+      refreshToken: this.authService.generateRefreshToken({ id })
     };
   }
 
@@ -96,7 +100,7 @@ export class AuthController {
   async authByIdToken(@Body() { idToken }: AuthByIdTokenRequest): Promise<TokenResponse> {
     const { email, provider, picture, name } = this.authService.decodeAuth0Token(idToken);
 
-    const user = await firstValueFrom(this.userServiceClient.send('USER_UPSERT_WITH_PROVIDER', {
+    const { id, role } = await firstValueFrom(this.userServiceClient.send('USER_UPSERT_WITH_PROVIDER', {
       name,
       email,
       providers: [{
@@ -106,18 +110,35 @@ export class AuthController {
     }));
 
     return {
-      token: this.authService.generateAuthToken({ id: user.id, email, role: user.role })
+      accessToken: this.authService.generateAccessToken({ id, role }),
+      refreshToken: this.authService.generateRefreshToken({ id })
+    };
+  }
+
+  @Post('/refresh-token')
+  @ApiForbiddenException()
+  async refreshToken(@Req() req: Request): Promise<TokenResponse> {
+    const refreshToken = req.cookies.refreshToken;
+    const { success, message } = this.authService.verifyPrimaryRefreshToken(refreshToken);
+
+    if (!success) throw new ForbiddenException(message);
+
+    const { id } = this.authService.decodeToken<RefreshTokenPayload>(refreshToken);
+    const { role } = await firstValueFrom(this.userServiceClient.send('USER_GET_BY_ID', { id }));
+
+    return {
+      accessToken: this.authService.generateAccessToken({ id, role }),
+      refreshToken: this.authService.generateRefreshToken({ id })
     };
   }
 
   @Post('/reset-password')
-  @UseInterceptors(ClassSerializerInterceptor)
   @ApiBearAuthWithRoles([RoleEnum.User, RoleEnum.Admin])
   @ApiUnauthorizedException()
   @ApiBadRequestException()
-  async resetPassword(@Request() req: RequestWithCurrentUser, @Body() resetPasswordRequest: ResetPasswordRequest) {
+  async resetPassword(@Req() req: RequestWithCurrentUser, @Body() resetPasswordRequest: ResetPasswordRequest) {
     const { id } = req.currentUser;
-    const { password, passwordSalt } = await firstValueFrom(this.userServiceClient.send('GET_USER_BY_ID', { id }));
+    const { password, passwordSalt } = await firstValueFrom(this.userServiceClient.send('USER_GET_BY_ID', { id }));
     const { oldPassword, newPassword } = resetPasswordRequest;
     const hashOldPassword = this.authService.hashPasswordFactory(oldPassword, passwordSalt);
 
@@ -131,11 +152,10 @@ export class AuthController {
   }
 
   @Get('/me')
-  @UseInterceptors(ClassSerializerInterceptor)
   @ApiBearAuthWithRoles([RoleEnum.User, RoleEnum.Admin])
   @ApiUnauthorizedException()
-  @ApiForbiddenResourceException()
-  async me(@Request() req: RequestWithCurrentUser) {
+  @ApiForbiddenException()
+  async me(@Req() req: RequestWithCurrentUser) {
     const { id } = req.currentUser;
     return await firstValueFrom(this.userServiceClient.send('USER_GET_BY_ID', { id }));
   }

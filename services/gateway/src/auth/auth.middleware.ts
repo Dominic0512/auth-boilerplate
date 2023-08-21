@@ -12,12 +12,10 @@ export class JWTMiddleware implements NestMiddleware {
   constructor(private readonly authService: AuthService) {}
   async use(req: Request, _response: Response, next: NextFunction) {
     const token = parseBearerToken(req);
-
-    if (token && this.authService.verifyPrimaryAuthToken(token).success) {
+    req['currentUser'] = null;
+    if (token && this.authService.verifyPrimaryAccessToken(token).success) {
       const currentUser: CurrentUser = this.authService.decodeToken(token);
       req['currentUser'] = currentUser;
-    } else {
-      req['currentUser'] = null;
     }
 
     next();

@@ -58,7 +58,7 @@ export class UserService {
     }, ['userId', 'name']);
   }
 
-  async createWithPassword({ name, password, verifyToken, ...rest }: CreateUserWithPasswordDto) {
+  async createWithPassword({ name, verifyToken, ...rest }: CreateUserWithPasswordDto) {
     const user = await this.userRepository.save({
       ...rest,
       name,
