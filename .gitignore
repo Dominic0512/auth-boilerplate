@@ -3,3 +3,5 @@ terraform/
 
 # Local database files
 cockroach-data/
+
+.env
