@@ -10,7 +10,7 @@ import {
   Req,
   ForbiddenException,
 } from '@nestjs/common';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 import { Request } from 'express';
@@ -130,6 +130,11 @@ export class AuthController {
       accessToken: this.authService.generateAccessToken({ id, role }),
       refreshToken: this.authService.generateRefreshToken({ id })
     };
+  }
+
+  @Post('/logout')
+  async logout() {
+    return {};
   }
 
   @Post('/reset-password')

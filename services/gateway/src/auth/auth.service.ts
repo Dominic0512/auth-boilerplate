@@ -117,8 +117,8 @@ export class AuthService {
     payload: T,
     options?: GenerateTokenOptions
   ) {
-    const aging = options.aging ?? this.accessTokenAging;
-    const secret = options.secret ?? this.accessTokenSecret;
+    const aging = options?.aging ?? this.accessTokenAging;
+    const secret = options?.secret ?? this.accessTokenSecret;
 
     return jwt.sign(payload, secret, {
       issuer: this.jwtIssuer,
