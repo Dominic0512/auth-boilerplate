@@ -23,7 +23,6 @@ services:
       - "10001:8000"
     volumes:
       - ../:/var/app/auth-boilerplate
-    restart: on-failure
   user:
     image: node-dev:local
     container_name: user
@@ -34,4 +33,3 @@ services:
       - SERVICE=user
     volumes:
       - ../:/var/app/auth-boilerplate
-    restart: on-failure
