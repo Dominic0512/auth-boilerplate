@@ -1,6 +1,7 @@
 export default () => {
   return {
     core: {
+      nodeEnv: process.env.NODE_ENV,
       host: process.env.USER_HOST,
       port: Number(process.env.USER_PORT),
       emailVerifyEndpoint: process.env.EMAIL_VERIFY_ENDPOINT,
@@ -10,6 +11,8 @@ export default () => {
       port: process.env.DATABASE_PORT,
       name: process.env.DATABASE_NAME,
       username: process.env.DATABASE_USER,
+      password: process.env.DATABASE_PASSWORD,
+      ssl: process.env.DATABASE_SSL === 'true' ? true : false,
     },
     mailerSend: {
       domain: process.env.MAILER_SEND_DOMAIN,

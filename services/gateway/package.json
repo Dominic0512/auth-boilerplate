@@ -37,8 +37,7 @@
     "jwks-rsa": "^3.0.1",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
-    "rxjs": "^7.2.0",
-    "user": "workspace:^"
+    "rxjs": "^7.2.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",
@@ -91,6 +90,11 @@
       "start:dev": {
         "configurations": {
           "development": {}
+        }
+      },
+      "start:prod": {
+        "configurations": {
+          "production": {}
         }
       }
     }

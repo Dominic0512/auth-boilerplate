@@ -1,0 +1,46 @@
+###############################################
+# Stage 1: Image for building the application
+###############################################
+FROM node:18-alpine AS builder
+
+ENV NODE_ENV=development
+ENV APP_DIR=/var/app/auth-boilerplate
+
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
+RUN apk add --no-cache python3 g++ make
+
+# Add a global package
+RUN pnpm add -g @upleveled/preflight@latest
+
+WORKDIR ${APP_DIR}
+
+COPY . .
+
+RUN pnpm run module:install
+
+ENV NODE_ENV=production
+RUN pnpm run -r build
+
+###############################################
+# Stage 2: Image for running the application
+###############################################
+FROM node:18-alpine AS runner
+
+ENV PORT=8000
+ENV NODE_ENV=production
+ENV APP_DIR=/var/app/auth-boilerplate
+
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
+COPY --from=builder ${APP_DIR} ${APP_DIR}
+
+WORKDIR ${APP_DIR}
+
+EXPOSE ${PORT}
+
+ENTRYPOINT ["/bin/sh", "./scripts/run_service.general.sh"]

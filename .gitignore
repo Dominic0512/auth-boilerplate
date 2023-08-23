@@ -1,7 +1,14 @@
 node_modules/
-terraform/
 
 # Local database files
 cockroach-data/
 
+# Environments
 .env
+.env.production
+
+# Terraform
+*.tfstate
+*.tfstate.backup
+.terraform
+terraform/ecs

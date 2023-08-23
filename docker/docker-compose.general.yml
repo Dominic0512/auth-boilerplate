@@ -1,0 +1,17 @@
+# @format
+name: auth-boilerplate
+version: "3.9"
+services:
+  gateway:
+    image: auth-boilerplate:latest
+    container_name: gateway
+    environment:
+      - SERVICE=gateway
+    ports:
+      - "10001:8000"
+  user:
+    image: auth-boilerplate:latest
+    container_name: user
+    environment:
+      - SERVICE=user
+    restart: on-failure

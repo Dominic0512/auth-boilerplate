@@ -2,7 +2,8 @@
   "name": "root",
   "private": true,
   "scripts": {
-    "clean": "lerna clean"
+    "module:install": "pnpm install",
+    "module:clean": "lerna clean && rm -rf ./node_modules"
   },
   "workspaces": [
     "packages/*",
@@ -10,6 +11,7 @@
     "sites/*"
   ],
   "devDependencies": {
+    "@nestjs/cli": "^9.0.0",
     "lerna": "^7.1.5",
     "nx": "^16.7.2"
   }
