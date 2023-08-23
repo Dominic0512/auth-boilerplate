@@ -5,6 +5,7 @@ cockroach-data/
 
 # Environments
 .env
+.env.development
 .env.production
 
 # Terraform
