@@ -5,7 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import configuration from './config/configuration';
 import { AuthModule } from './auth/auth.module';
 import { RolesGuard } from './auth/auth.guard';
-import { AppService } from './app.service';
+import { AppController } from './app.controller';
 import { AuthController } from './auth.controller';
 import { UserController } from './user.controller';
 import { JWTMiddleware } from './auth/auth.middleware';
@@ -20,11 +20,11 @@ import { ClientProxyFactory, Transport } from '@nestjs/microservices';
     AuthModule,
   ],
   controllers: [
+    AppController,
     AuthController,
     UserController,
   ],
   providers: [
-    AppService,
     {
       provide: APP_GUARD,
       useClass: RolesGuard,

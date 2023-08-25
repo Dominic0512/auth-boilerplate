@@ -3,7 +3,8 @@
   "private": true,
   "scripts": {
     "module:install": "pnpm install",
-    "module:clean": "lerna clean && rm -rf ./node_modules"
+    "module:clean": "lerna clean && rm -rf ./node_modules",
+    "bump": "lerna version"
   },
   "workspaces": [
     "packages/*",

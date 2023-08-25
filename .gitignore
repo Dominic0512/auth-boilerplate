@@ -7,9 +7,13 @@ cockroach-data/
 .env
 .env.development
 .env.production
+.env.makefile
 
 # Terraform
 *.tfstate
 *.tfstate.backup
 .terraform
-terraform/ecs
+terraform/service
+# terraform/service/backends/production.tfvars
+
+.DS_Store

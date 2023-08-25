@@ -38,6 +38,11 @@ export class AuthController {
     @Inject('USER_SERVICE') private readonly userServiceClient: ClientProxy,
   ) {}
 
+  @Get('/__health')
+  __health() {
+    return true;
+  }
+
   @Post('/register')
   @ApiBadRequestException()
   async register(@Body() { email, password }: RegisterRequest): Promise<any> {
