@@ -13,9 +13,10 @@ export class UserController {
     private userService: UserService,
     private eventEmitter: EventEmitter2
   ) {}
-  @Get()
-  list(): string {
-    return 'user list';
+
+  @MessagePattern('USER_LIST')
+  async list(){
+    return await this.userService.find();
   }
 
   @MessagePattern('USER_GET_BY_ID')

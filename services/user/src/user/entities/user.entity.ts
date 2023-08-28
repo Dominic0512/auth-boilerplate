@@ -10,6 +10,7 @@ import { Exclude } from 'class-transformer';
 
 import { UserStateEnum, UserRoleEnum } from '../../common/enum/user.enum';
 import { UserProvider } from './user-provider.entity';
+import { UserActivity } from './user-activity.entity';
 
 @Entity()
 export class User {
@@ -51,9 +52,18 @@ export class User {
   @OneToMany(() => UserProvider, (provider) => provider.user, { cascade: true })
   providers: UserProvider[];
 
+  @OneToMany(() => UserActivity, (activity) => activity.user, { cascade: true })
+  activities: UserActivity[];
+
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @Column({ nullable: true })
+  lastSessionAt: Date;
+
+  @Column({ default: 0 })
+  loggedInCount: number;
 }

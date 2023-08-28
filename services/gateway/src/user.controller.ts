@@ -23,8 +23,8 @@ export class UserController {
     @Inject('USER_SERVICE') private readonly userServiceClient: ClientProxy,
   ) {}
   @Get()
-  list(): string {
-    return 'user list';
+  async list(): Promise<any> {
+    return await firstValueFrom(this.userServiceClient.send('USER_LIST', {}));
   }
 
   @Get('/:id/profile')

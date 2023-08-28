@@ -29,6 +29,12 @@ export class UserService {
     return UserProviderEnum[capitalizeName];
   }
 
+  async find() {
+    return await this.userRepository
+      .createQueryBuilder('user')
+      .getMany();
+  }
+
   async upsertWithProvider({ providers, name, email }: UpsertUserDto) {
     let user = await this.findOneByEmail(email);
 
