@@ -10,7 +10,7 @@ import { map } from 'rxjs/operators';
 import { CookieOptions, Request, Response } from 'express';
 
 @Injectable()
-export class AuthInterceptor implements NestInterceptor {
+export class RefreshTokenInterceptor implements NestInterceptor {
   private refreshTokenOptions: CookieOptions
 
   constructor(

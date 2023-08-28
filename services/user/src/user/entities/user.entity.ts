@@ -8,17 +8,8 @@ import {
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 
+import { UserStateEnum, UserRoleEnum } from '../../common/enum/user.enum';
 import { UserProvider } from './user-provider.entity';
-
-export enum UserRoleEnum {
-  User = 'User',
-  Admin = 'Admin'
-}
-
-export enum UserStateEnum {
-  Pending = 'Pending',
-  Verified = 'Verified',
-}
 
 @Entity()
 export class User {

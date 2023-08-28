@@ -17,12 +17,12 @@ import { Request } from 'express';
 
 import { ApiBadRequestException, ApiForbiddenException, ApiUnauthorizedException } from './common/swagger';
 import { AuthService } from './auth/auth.service';
-import { RequestWithCurrentUser } from './auth/auth.middleware';
+import { RequestWithCurrentUser } from './auth/middleware';
 import { ApiBearAuthWithRoles } from './auth/auth.decorator';
 import { EmailVerificationTokenPayload, RefreshTokenPayload, RoleEnum } from './auth/auth.type';
 import { TokenResponse } from './auth/auth.response';
 import { LoginRequest, AuthByIdTokenRequest, RegisterRequest, VerifyRequest, ResetPasswordRequest } from './auth/auth.request';
-import { AuthInterceptor } from './auth/auth.interceptor';
+import { RefreshTokenInterceptor } from './auth/interceptor';
 
 export enum UserStateEnum {
   Pending = 'Pending',
@@ -31,7 +31,7 @@ export enum UserStateEnum {
 
 @ApiTags('auth')
 @Controller()
-@UseInterceptors(AuthInterceptor)
+@UseInterceptors(RefreshTokenInterceptor)
 export class AuthController {
   constructor(
     private authService: AuthService,
@@ -93,6 +93,8 @@ export class AuthController {
       throw new UnauthorizedException('Invalid password.');
     }
 
+    this.userServiceClient.emit('USER_LOGGED_IN', { id });
+
     return {
       accessToken: this.authService.generateAccessToken({ id, role }),
       refreshToken: this.authService.generateRefreshToken({ id })
@@ -114,6 +116,8 @@ export class AuthController {
       }]
     }));
 
+    this.userServiceClient.emit('USER_LOGGED_IN', { id, provider });
+
     return {
       accessToken: this.authService.generateAccessToken({ id, role }),
       refreshToken: this.authService.generateRefreshToken({ id })
@@ -131,6 +135,8 @@ export class AuthController {
     const { id } = this.authService.decodeToken<RefreshTokenPayload>(refreshToken);
     const { role } = await firstValueFrom(this.userServiceClient.send('USER_GET_BY_ID', { id }));
 
+    this.userServiceClient.emit('USER_TOKEN_REFRESHED', { id });
+
     return {
       accessToken: this.authService.generateAccessToken({ id, role }),
       refreshToken: this.authService.generateRefreshToken({ id })
@@ -139,6 +145,7 @@ export class AuthController {
 
   @Post('/logout')
   async logout() {
+    // NOTE: Currently, only clean the refresh token in cookies by auth.interceptor.ts
     return {};
   }
 

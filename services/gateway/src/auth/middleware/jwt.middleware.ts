@@ -1,7 +1,7 @@
 import { Injectable, NestMiddleware } from "@nestjs/common";
 import { NextFunction, Request, Response } from "express";
-import { AuthService } from "./auth.service";
-import { CurrentUser } from "./auth.type";
+import { AuthService } from "../auth.service";
+import { CurrentUser } from "../auth.type";
 
 export interface RequestWithCurrentUser extends Request {
   currentUser: CurrentUser

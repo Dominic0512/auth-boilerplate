@@ -4,10 +4,11 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ConfigService } from '@nestjs/config';
 import { Repository } from 'typeorm';
 
-import { User, UserStateEnum } from './entities/user.entity';
-import { ProviderEnum, UserProvider } from './entities/user-provider.entity';
-import { CreateUserWithPasswordDto, ProviderDto, UpsertUserDto } from './user.dto';
 import { UserRegisterByPasswordEvent } from '../common/event/user.event';
+import { UserProviderEnum, UserStateEnum } from '../common/enum/user.enum';
+import { User } from './entities/user.entity';
+import { UserProvider } from './entities/user-provider.entity';
+import { CreateUserWithPasswordDto, ProviderDto, UpsertUserDto } from './user.dto';
 
 @Injectable()
 export class UserService {
@@ -25,7 +26,7 @@ export class UserService {
   transformProviderName(name: string) {
     const lowerName = name.toLowerCase();
     const capitalizeName = lowerName.charAt(0).toUpperCase() + lowerName.slice(1);
-    return ProviderEnum[capitalizeName];
+    return UserProviderEnum[capitalizeName];
   }
 
   async upsertWithProvider({ providers, name, email }: UpsertUserDto) {
@@ -63,7 +64,7 @@ export class UserService {
       ...rest,
       name,
       providers: [{
-        name: ProviderEnum.Primary,
+        name: UserProviderEnum.Primary,
         picture: this.dummyPictureFactory(name),
       }]
     });

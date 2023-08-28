@@ -1,13 +1,17 @@
 import { Controller, Get } from '@nestjs/common';
-import { MessagePattern, Payload } from '@nestjs/microservices';
+import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
-import { UserService } from './user.service';
 import { CreateUserWithPasswordDto, ResetUserPasswordDto, UpsertUserDto } from './user.dto';
+import { UserProviderEnum } from '../common/enum/user.enum';
+import { UserLoggedInEvent, UserTokenRefreshedEvent } from '../common/event/user.event';
+import { UserService } from './user.service';
 
 @Controller('user')
 export class UserController {
   constructor(
-    private userService: UserService
+    private userService: UserService,
+    private eventEmitter: EventEmitter2
   ) {}
   @Get()
   list(): string {
@@ -49,5 +53,24 @@ export class UserController {
   @MessagePattern('USER_RESET_PASSWORD')
   async updatePassword(@Payload() { id, newHashPassword }: ResetUserPasswordDto) {
     return await this.userService.updatePasswordById(id, newHashPassword);
+  }
+
+  @EventPattern('USER_LOGGED_IN')
+  handleUserLoggedIn(@Payload() { id, provider = UserProviderEnum.Primary }) {
+    this.eventEmitter.emit(
+      UserLoggedInEvent.eventName,
+      new UserLoggedInEvent({
+        id,
+        provider: this.userService.transformProviderName(provider)
+      }),
+    );
+  }
+
+  @EventPattern('USER_TOKEN_REFRESHED')
+  handleUserTokenRefreshed(@Payload() { id }) {
+    this.eventEmitter.emit(
+      UserTokenRefreshedEvent.eventName,
+      new UserTokenRefreshedEvent({ id }),
+    );
   }
 }

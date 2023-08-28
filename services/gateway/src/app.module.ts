@@ -8,7 +8,7 @@ import { RolesGuard } from './auth/auth.guard';
 import { AppController } from './app.controller';
 import { AuthController } from './auth.controller';
 import { UserController } from './user.controller';
-import { JWTMiddleware } from './auth/auth.middleware';
+import { JWTMiddleware } from './auth/middleware';
 import { ClientProxyFactory, Transport } from '@nestjs/microservices';
 
 @Module({
@@ -41,7 +41,7 @@ import { ClientProxyFactory, Transport } from '@nestjs/microservices';
         })
       },
       inject: [ConfigService]
-    },
+    }
   ],
 })
 

@@ -12,12 +12,12 @@ export class NotificationService {
 
   @OnEvent(UserRegisterByPasswordEvent.eventName, { async: true })
   async handleUserRegisterByPasswordEvent({ payload }: UserRegisterByPasswordEvent) {
+    this.logger.verbose(`Receive ${UserRegisterByPasswordEvent.eventName} with email: ${payload.email}`);
     const { email, name, link } = payload;
     await this.emailService.sendEmailByTemplateId(email, 'jpzkmgqnxe1g059v', {
       name,
       email,
       link
     });
-    this.logger.verbose(`Receive ${UserRegisterByPasswordEvent.eventName} with ${payload.email}.`);
   }
 }

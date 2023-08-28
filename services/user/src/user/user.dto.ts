@@ -1,6 +1,6 @@
 import { ArrayNotEmpty, IsBase64, IsEmail, IsEnum, IsHash, IsJWT, IsStrongPassword, IsUrl, MinLength } from 'class-validator';
 
-import { ProviderEnum } from './entities/user-provider.entity';
+import { UserProviderEnum } from '../common/enum/user.enum';
 
 export const passwordRules = {
   minLowercase: 1,
@@ -11,8 +11,8 @@ export const passwordRules = {
 }
 
 export class ProviderDto {
-  @IsEnum(ProviderEnum)
-  name: ProviderEnum;
+  @IsEnum(UserProviderEnum)
+  name: UserProviderEnum;
 
   @IsUrl()
   picture: string;

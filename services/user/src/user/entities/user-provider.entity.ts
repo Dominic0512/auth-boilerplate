@@ -5,21 +5,17 @@ import {
   PrimaryColumn
 } from 'typeorm';
 
+import { UserProviderEnum } from '../../common/enum/user.enum';
 import { User } from './user.entity';
 
-export enum ProviderEnum {
-  Facebook = 'Facebook',
-  Google = 'Google',
-  Primary = 'Primary'
-}
 @Entity()
 export class UserProvider {
   @Column({
     type: 'enum',
-    enum: ProviderEnum,
+    enum: UserProviderEnum,
   })
   @PrimaryColumn()
-  name: ProviderEnum;
+  name: UserProviderEnum;
 
   @Column()
   picture: string;
