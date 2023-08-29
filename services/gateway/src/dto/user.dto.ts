@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Exclude } from "class-transformer";
+import { Exclude, Expose } from "class-transformer";
 
 export class ManipulateUserDto {
   @ApiProperty()
@@ -12,37 +12,46 @@ export class UserDto {
   }
 
   @ApiProperty()
+  @Expose()
   id: number;
 
   @ApiProperty()
+  @Expose()
   state: string;
 
   @ApiProperty()
+  @Expose()
   role: string;
 
   @ApiProperty()
+  @Expose()
   name: string;
 
   @ApiProperty()
+  @Expose()
   email: string;
 
-  @ApiProperty()
   @Exclude({ toPlainOnly: true })
   password?: string;
 
-  @ApiProperty()
   @Exclude({ toPlainOnly: true })
   passwordSalt?: string;
 
   @ApiProperty()
+  @Expose()
   createdAt: Date;
 
   @ApiProperty()
+  @Expose()
   updatedAt: Date;
+}
 
+export class InternalUserDto extends UserDto {
   @ApiProperty()
+  @Expose()
   lastSessionAt: Date;
 
   @ApiProperty()
+  @Expose()
   loggedInCount: number;
 }

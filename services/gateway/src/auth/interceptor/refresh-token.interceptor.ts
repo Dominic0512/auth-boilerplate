@@ -29,18 +29,16 @@ export class RefreshTokenInterceptor implements NestInterceptor {
         const req = context.switchToHttp().getRequest<Request>();
         const res = context.switchToHttp().getResponse<Response>();
 
-        if (req.url === '/api/logout') {
+        if (['/api/logout', '/api/reset-password'].includes(req.url)) {
           res.clearCookie('refreshToken', this.refreshTokenOptions);
           return data;
         }
 
-        if (!data.hasOwnProperty('refreshToken')) return data;
+        if (!data.refreshToken) return data;
 
-        const { refreshToken, ...rest } = data;
+        res.cookie('refreshToken', data.refreshToken, this.refreshTokenOptions);
 
-        res.cookie('refreshToken', refreshToken, this.refreshTokenOptions);
-
-        return rest;
+        return data;
       }),
     );
   }

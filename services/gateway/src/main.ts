@@ -36,7 +36,7 @@ async function bootstrap() {
   app.use(cookieParser());
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalPipes(new ClassValidatorPipe());
-  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector), { strategy: "excludeAll" }));
 
   await app.listen(8000);
 }

@@ -10,11 +10,12 @@ import {
   Req,
   ForbiddenException,
   LiteralObject,
+  Res,
 } from '@nestjs/common';
-import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 
 import { ApiBadRequestException, ApiForbiddenException, ApiUnauthorizedException } from './common/swagger';
 import { AuthService } from './auth/auth.service';
@@ -40,12 +41,8 @@ export class AuthController {
     @Inject('USER_SERVICE') private readonly userServiceClient: ClientProxy,
   ) {}
 
-  @Get('/__health')
-  __health() {
-    return true;
-  }
-
   @Post('/register')
+  @ApiCreatedResponse({ type: UserDto, description: 'Register request sent, please check the verification email.' })
   @ApiBadRequestException()
   async register(@Body() { email, password }: RegisterRequest): Promise<UserDto> {
     const user = await firstValueFrom(this.userServiceClient.send('USER_GET_BY_EMAIL', { email }));
@@ -63,17 +60,19 @@ export class AuthController {
   }
 
   @Post('/verify')
+  @ApiCreatedResponse({ type: TokenResponse, description: 'Email verified.' })
   @ApiUnauthorizedException()
   async verify(@Body() { token }: VerifyRequest): Promise<TokenResponse> {
     const { email } = this.authService.decodeToken<{ email: string }>(token);
     const { id, role } = await firstValueFrom(this.userServiceClient.send('USER_VERIFY_BY_EMAIL', { email }));
-    return {
+    return new TokenResponse({
       accessToken: this.authService.generateAccessToken({ id, role }),
       refreshToken: this.authService.generateRefreshToken({ id })
-    };
+    });
   }
 
   @Post('/login')
+  @ApiCreatedResponse({ type: TokenResponse, description: 'Logged in.' })
   @ApiBadRequestException()
   @ApiUnauthorizedException()
   async login(@Body() { email, password }: LoginRequest): Promise<TokenResponse> {
@@ -97,14 +96,20 @@ export class AuthController {
 
     this.userServiceClient.emit('USER_LOGGED_IN', { id });
 
-    return {
+    const result = new TokenResponse({
       accessToken: this.authService.generateAccessToken({ id, role }),
       refreshToken: this.authService.generateRefreshToken({ id })
-    };
+    });
+    console.log(result);
+
+    return new TokenResponse({
+      accessToken: this.authService.generateAccessToken({ id, role }),
+      refreshToken: this.authService.generateRefreshToken({ id })
+    });
   }
 
   @Post('/auth-by-id-token')
-  @ApiCreatedResponse({ type: TokenResponse, description: "Sign up successfully." })
+  @ApiCreatedResponse({ type: TokenResponse, description: "Authorization by OIDC is accepted." })
   @ApiBadRequestException()
   async authByIdToken(@Body() { idToken }: AuthByIdTokenRequest): Promise<TokenResponse> {
     const { email, provider, picture, name } = this.authService.decodeAuth0Token(idToken);
@@ -120,13 +125,14 @@ export class AuthController {
 
     this.userServiceClient.emit('USER_LOGGED_IN', { id, provider });
 
-    return {
+    return new TokenResponse({
       accessToken: this.authService.generateAccessToken({ id, role }),
       refreshToken: this.authService.generateRefreshToken({ id })
-    };
+    });;
   }
 
   @Post('/refresh-token')
+  @ApiCreatedResponse({ type: TokenResponse, description: "Authorization by OIDC is accepted." })
   @ApiForbiddenException()
   async refreshToken(@Req() req: Request): Promise<TokenResponse> {
     const refreshToken = req.cookies.refreshToken;
@@ -139,23 +145,29 @@ export class AuthController {
 
     this.userServiceClient.emit('USER_TOKEN_REFRESHED', { id });
 
-    return {
+    return new TokenResponse({
       accessToken: this.authService.generateAccessToken({ id, role }),
       refreshToken: this.authService.generateRefreshToken({ id })
-    };
+    });
   }
 
   @Post('/logout')
-  async logout(): Promise<LiteralObject> {
+  @ApiNoContentResponse({ description: 'Logged out.'})
+  async logout(@Res() res: Response): Promise<LiteralObject> {
     // NOTE: Currently, only clean the refresh token in cookies by auth.interceptor.ts
-    return {};
+    return res.status(204).json({});
   }
 
   @Post('/reset-password')
+  @ApiNoContentResponse({ description: 'The password is reset. Please re-login.' })
   @ApiBearAuthWithRoles([RoleEnum.User, RoleEnum.Admin])
   @ApiUnauthorizedException()
   @ApiBadRequestException()
-  async resetPassword(@Req() req: RequestWithCurrentUser, @Body() resetPasswordRequest: ResetPasswordRequest): Promise<UserDto> {
+  async resetPassword(
+    @Req() req: RequestWithCurrentUser,
+    @Body() resetPasswordRequest: ResetPasswordRequest,
+    @Res() res: Response
+  ): Promise<LiteralObject> {
     const { id } = req.currentUser;
     const { password, passwordSalt } = await firstValueFrom(this.userServiceClient.send('USER_GET_BY_ID', { id }));
     const { oldPassword, newPassword } = resetPasswordRequest;
@@ -166,11 +178,12 @@ export class AuthController {
     }
 
     const newHashPassword = this.authService.hashPasswordFactory(newPassword, passwordSalt );
-
-    return new UserDto(await firstValueFrom(this.userServiceClient.send('USER_RESET_PASSWORD', { id, newHashPassword })));
+    await firstValueFrom(this.userServiceClient.send('USER_RESET_PASSWORD', { id, newHashPassword }));
+    return res.status(204).json({});
   }
 
   @Get('/me')
+  @ApiOkResponse({ type: UserDto, description: 'Get personal profiles.' })
   @ApiBearAuthWithRoles([RoleEnum.User, RoleEnum.Admin])
   @ApiUnauthorizedException()
   @ApiForbiddenException()

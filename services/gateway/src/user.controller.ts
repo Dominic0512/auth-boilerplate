@@ -6,7 +6,7 @@ import {
   Param,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { firstValueFrom } from 'rxjs';
 
 import { ApiForbiddenException, ApiUnauthorizedException } from './common/swagger';
@@ -24,11 +24,13 @@ export class UserController {
   ) {}
 
   @Get()
-  async list(): Promise<UserDto> {
+  @ApiOkResponse({ type: UserDto, isArray: true, description: 'Receive user list.'})
+  async list(): Promise<UserDto[]> {
     return (await firstValueFrom(this.userServiceClient.send('USER_LIST', {}))).map((item: LiteralObject) => new UserDto(item));
   }
 
   @Get('/statistics')
+  @ApiOkResponse({ type: UserDto, isArray: true, description: 'Receive basic user statistics.'})
   async statistics() {
     return await firstValueFrom(this.userServiceClient.send('USER_STATISTICS', {}));
   }
