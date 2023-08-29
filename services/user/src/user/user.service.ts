@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ConfigService } from '@nestjs/config';
-import { Between, DataSource, QueryBuilder, Repository } from 'typeorm';
+import { Between, DataSource, InsertResult, QueryBuilder, Repository } from 'typeorm';
 
 import { UserRegisterByPasswordEvent } from '../common/event/user.event';
 import { UserProviderEnum, UserStateEnum } from '../common/enum/user.enum';
@@ -20,25 +20,25 @@ export class UserService {
     private eventEmitter: EventEmitter2
   ) {}
 
-  dummyPictureFactory(name: string) {
+  dummyPictureFactory(name: string): string {
     return `https://i0.wp.com/cdn.auth0.com/avatars/${name.slice(0,2)}.png?ssl=1`;
   }
 
-  transformProviderName(name: string) {
+  transformProviderName(name: string): UserProviderEnum {
     const lowerName = name.toLowerCase();
     const capitalizeName = lowerName.charAt(0).toUpperCase() + lowerName.slice(1);
     return UserProviderEnum[capitalizeName];
   }
 
-  async find() {
+  async find(): Promise<User[]> {
     return await this.userRepository.find();
   }
 
-  async count() {
+  async count(): Promise<number> {
     return await this.userRepository.count();
   }
 
-  async countActiveUsersByTimeframe(startedAt: Date, endedAt: Date) {
+  async countActiveUsersByTimeframe(startedAt: Date, endedAt: Date): Promise<number> {
     return await this.userRepository.count({
       where: {
         lastSessionAt: Between<Date>(startedAt, endedAt)
@@ -46,7 +46,7 @@ export class UserService {
     });
   }
 
-  async avgActiveUsersPerDateByTimeframe(startedAt: Date, endedAt: Date) {
+  async avgActiveUsersPerDateByTimeframe(startedAt: Date, endedAt: Date): Promise<number> {
     const { avg } = await this.dateSource
       .createQueryBuilder()
       .select("ROUND(AVG(uc.count), 1)", "avg")
@@ -65,10 +65,10 @@ export class UserService {
           .addGroupBy('day');
       }, "uc")
       .getRawOne();
-    return avg;
+    return Number(avg);
   }
 
-  async upsertWithProvider({ providers, name, email }: UpsertUserDto) {
+  async upsertWithProvider({ providers, name, email }: UpsertUserDto): Promise<User> {
     let user = await this.findOneByEmail(email);
 
     if (!user) {
@@ -91,7 +91,7 @@ export class UserService {
     return user;
   }
 
-  async upsertNewProvider(userId: number, provider: ProviderDto) {
+  async upsertNewProvider(userId: number, provider: ProviderDto): Promise<InsertResult> {
     return await this.userProviderRepository.upsert({
       userId,
       ...provider,
@@ -120,21 +120,21 @@ export class UserService {
     return user;
   }
 
-  async findOneById(id: number) {
+  async findOneById(id: number): Promise<User> {
     return await this.userRepository.findOneBy({ id });
   }
 
-  async findOneByEmail(email: string) {
+  async findOneByEmail(email: string): Promise<User> {
     return await this.userRepository.findOneBy({ email });
   }
 
-  async verifyByEmail(email: string) {
+  async verifyByEmail(email: string): Promise<User> {
     const user = await this.findOneByEmail(email);
     user.state = UserStateEnum.Verified;
     return this.userRepository.save(user);
   }
 
-  async updatePasswordById(id: number, password: string) {
+  async updatePasswordById(id: number, password: string): Promise<User> {
     const user = await this.findOneById(id);
 
     return this.userRepository.save(

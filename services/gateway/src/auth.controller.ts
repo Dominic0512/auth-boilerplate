@@ -159,8 +159,8 @@ export class AuthController {
   }
 
   @Post('/reset-password')
-  @ApiNoContentResponse({ description: 'The password is reset. Please re-login.' })
   @ApiBearAuthWithRoles([RoleEnum.User, RoleEnum.Admin])
+  @ApiNoContentResponse({ description: 'The password is reset. Please re-login.' })
   @ApiUnauthorizedException()
   @ApiBadRequestException()
   async resetPassword(

@@ -1,16 +1,13 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Exclude, Expose } from "class-transformer";
+import { BaseDto } from "src/common/dto/base.dto";
 
 export class ManipulateUserDto {
   @ApiProperty()
   id: number;
 }
 
-export class UserDto {
-  constructor(partial: Partial<UserDto>) {
-    Object.assign(this, partial);
-  }
-
+export class UserDto extends BaseDto<UserDto> {
   @ApiProperty()
   @Expose()
   id: number;
@@ -54,4 +51,18 @@ export class InternalUserDto extends UserDto {
   @ApiProperty()
   @Expose()
   loggedInCount: number;
+}
+
+export class UserStatisticsDto extends BaseDto<UserStatisticsDto>{
+  @ApiProperty()
+  @Expose()
+  countOfRegisterUsers: number;
+
+  @ApiProperty()
+  @Expose()
+  countOfActiveUsersByToday: number;
+
+  @ApiProperty()
+  @Expose()
+  averageOfActiveUsersInSevenDays: number;
 }
