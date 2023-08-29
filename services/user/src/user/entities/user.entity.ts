@@ -42,11 +42,11 @@ export class User {
   email: string;
 
   @Column({ nullable: true })
-  @Exclude()
+  @Exclude({ toPlainOnly: true })
   password?: string;
 
   @Column({ nullable: true })
-  @Exclude()
+  @Exclude({ toPlainOnly: true })
   passwordSalt?: string;
 
   @OneToMany(() => UserProvider, (provider) => provider.user, { cascade: true })

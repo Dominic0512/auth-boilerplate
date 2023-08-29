@@ -9,6 +9,7 @@ import {
   Get,
   Req,
   ForbiddenException,
+  LiteralObject,
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { ClientProxy } from '@nestjs/microservices';
@@ -23,6 +24,7 @@ import { EmailVerificationTokenPayload, RefreshTokenPayload, RoleEnum } from './
 import { TokenResponse } from './auth/auth.response';
 import { LoginRequest, AuthByIdTokenRequest, RegisterRequest, VerifyRequest, ResetPasswordRequest } from './auth/auth.request';
 import { RefreshTokenInterceptor } from './auth/interceptor';
+import { UserDto } from './dto/user.dto';
 
 export enum UserStateEnum {
   Pending = 'Pending',
@@ -45,19 +47,19 @@ export class AuthController {
 
   @Post('/register')
   @ApiBadRequestException()
-  async register(@Body() { email, password }: RegisterRequest): Promise<any> {
+  async register(@Body() { email, password }: RegisterRequest): Promise<UserDto> {
     const user = await firstValueFrom(this.userServiceClient.send('USER_GET_BY_EMAIL', { email }));
 
     if (user) {
       throw new BadRequestException(`The email ${email} is exists.`);
     }
 
-    return await firstValueFrom(this.userServiceClient.send('USER_CREATE_WITH_PASSWORD', {
+    return new UserDto(await firstValueFrom(this.userServiceClient.send('USER_CREATE_WITH_PASSWORD', {
       name: email.slice(0, email.indexOf('@')),
       email,
       ...this.authService.hashPasswordPairFactory(password),
       verifyToken: this.authService.generateToken<EmailVerificationTokenPayload>({ email })
-    }));
+    })));
   }
 
   @Post('/verify')
@@ -144,7 +146,7 @@ export class AuthController {
   }
 
   @Post('/logout')
-  async logout() {
+  async logout(): Promise<LiteralObject> {
     // NOTE: Currently, only clean the refresh token in cookies by auth.interceptor.ts
     return {};
   }
@@ -153,7 +155,7 @@ export class AuthController {
   @ApiBearAuthWithRoles([RoleEnum.User, RoleEnum.Admin])
   @ApiUnauthorizedException()
   @ApiBadRequestException()
-  async resetPassword(@Req() req: RequestWithCurrentUser, @Body() resetPasswordRequest: ResetPasswordRequest) {
+  async resetPassword(@Req() req: RequestWithCurrentUser, @Body() resetPasswordRequest: ResetPasswordRequest): Promise<UserDto> {
     const { id } = req.currentUser;
     const { password, passwordSalt } = await firstValueFrom(this.userServiceClient.send('USER_GET_BY_ID', { id }));
     const { oldPassword, newPassword } = resetPasswordRequest;
@@ -165,15 +167,15 @@ export class AuthController {
 
     const newHashPassword = this.authService.hashPasswordFactory(newPassword, passwordSalt );
 
-    return await firstValueFrom(this.userServiceClient.send('USER_RESET_PASSWORD', { id, newHashPassword }));
+    return new UserDto(await firstValueFrom(this.userServiceClient.send('USER_RESET_PASSWORD', { id, newHashPassword })));
   }
 
   @Get('/me')
   @ApiBearAuthWithRoles([RoleEnum.User, RoleEnum.Admin])
   @ApiUnauthorizedException()
   @ApiForbiddenException()
-  async me(@Req() req: RequestWithCurrentUser) {
+  async me(@Req() req: RequestWithCurrentUser): Promise<UserDto> {
     const { id } = req.currentUser;
-    return await firstValueFrom(this.userServiceClient.send('USER_GET_BY_ID', { id }));
+    return new UserDto(await firstValueFrom(this.userServiceClient.send('USER_GET_BY_ID', { id })));
   }
 }

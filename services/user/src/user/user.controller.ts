@@ -6,6 +6,7 @@ import { CreateUserWithPasswordDto, ResetUserPasswordDto, UpsertUserDto } from '
 import { UserProviderEnum } from '../common/enum/user.enum';
 import { UserLoggedInEvent, UserTokenRefreshedEvent } from '../common/event/user.event';
 import { UserService } from './user.service';
+import { User } from './entities/user.entity';
 
 @Controller('user')
 export class UserController {
@@ -20,12 +21,14 @@ export class UserController {
   }
 
   @MessagePattern('USER_GET_BY_ID')
-  async getById(@Payload() { id }) {
-    return await this.userService.findOneById(id);
+  async getById(@Payload() { id }): Promise<User> {
+    const user = await this.userService.findOneById(id);
+    console.log('USER CONTROLLOER', user.constructor.name);
+    return user;
   }
 
   @MessagePattern('USER_GET_BY_EMAIL')
-  async getByEmail(@Payload() { email }) {
+  async getByEmail(@Payload() { email }): Promise<User> {
     return await this.userService.findOneByEmail(email);
   }
 
