@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ConfigService } from '@nestjs/config';
-import { Repository } from 'typeorm';
+import { Between, DataSource, QueryBuilder, Repository } from 'typeorm';
 
 import { UserRegisterByPasswordEvent } from '../common/event/user.event';
 import { UserProviderEnum, UserStateEnum } from '../common/enum/user.enum';
@@ -13,6 +13,7 @@ import { CreateUserWithPasswordDto, ProviderDto, UpsertUserDto } from './user.dt
 @Injectable()
 export class UserService {
   constructor(
+    private dateSource: DataSource,
     private readonly configService: ConfigService,
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(UserProvider) private userProviderRepository: Repository<UserProvider>,
@@ -30,9 +31,41 @@ export class UserService {
   }
 
   async find() {
-    return await this.userRepository
-      .createQueryBuilder('user')
-      .getMany();
+    return await this.userRepository.find();
+  }
+
+  async count() {
+    return await this.userRepository.count();
+  }
+
+  async countActiveUsersByTimeframe(startedAt: Date, endedAt: Date) {
+    return await this.userRepository.count({
+      where: {
+        lastSessionAt: Between<Date>(startedAt, endedAt)
+      }
+    });
+  }
+
+  async avgActiveUsersPerDateByTimeframe(startedAt: Date, endedAt: Date) {
+    const { avg } = await this.dateSource
+      .createQueryBuilder()
+      .select("ROUND(AVG(uc.count), 1)", "avg")
+      .from((subQuery) => {
+        return subQuery
+          .select([
+            'DATE_PART(\'year\', "lastSessionAt") AS "year"',
+            'DATE_PART(\'month\', "lastSessionAt") AS "month"',
+            'DATE_PART(\'day\', "lastSessionAt") AS "day"',
+            'COUNT(user.name) AS "count"'
+          ])
+          .from(User, 'user')
+          .where('"lastSessionAt" BETWEEN :startedAt AND :endedAt', { startedAt, endedAt })
+          .addGroupBy('year')
+          .addGroupBy('month')
+          .addGroupBy('day');
+      }, "uc")
+      .getRawOne();
+    return avg;
   }
 
   async upsertWithProvider({ providers, name, email }: UpsertUserDto) {

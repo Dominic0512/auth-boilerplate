@@ -28,6 +28,11 @@ export class UserController {
     return (await firstValueFrom(this.userServiceClient.send('USER_LIST', {}))).map((item: LiteralObject) => new UserDto(item));
   }
 
+  @Get('/statistics')
+  async statistics() {
+    return await firstValueFrom(this.userServiceClient.send('USER_STATISTICS', {}));
+  }
+
   @Get('/:id/profile')
   @ApiBearAuthWithRoles([RoleEnum.Admin])
   @ApiUnauthorizedException()

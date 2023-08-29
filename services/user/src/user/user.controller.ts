@@ -1,6 +1,8 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import * as moment from 'moment';
+import 'moment-timezone';
 
 import { CreateUserWithPasswordDto, ResetUserPasswordDto, UpsertUserDto } from './user.dto';
 import { UserProviderEnum } from '../common/enum/user.enum';
@@ -30,6 +32,25 @@ export class UserController {
   @MessagePattern('USER_GET_BY_EMAIL')
   async getByEmail(@Payload() { email }): Promise<User> {
     return await this.userService.findOneByEmail(email);
+  }
+
+  @MessagePattern('USER_STATISTICS')
+  async getStatistics() {
+    const endOfToday = moment().tz('Asia/Taipei').set('hour', 23).set('minute', 59).set('second', 59).tz('UTC').toDate();
+    const endOfOneDayAgo = moment(endOfToday).subtract(1, 'days').toDate();
+    const endOfSevenDaysAgo = moment(endOfToday).subtract(7, 'days').toDate();
+
+    const result = await Promise.all([
+      this.userService.count(),
+      this.userService.countActiveUsersByTimeframe(endOfOneDayAgo, endOfToday),
+      this.userService.avgActiveUsersPerDateByTimeframe(endOfSevenDaysAgo, endOfToday)
+    ]);
+
+    return {
+      countOfRegisterUsers: result[0],
+      countOfActiveUsersByToday: result[1],
+      averageOfActiveUsersInSevenDays: result[2]
+    };
   }
 
   @MessagePattern('USER_CREATE_WITH_PASSWORD')
