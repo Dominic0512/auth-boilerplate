@@ -31,11 +31,11 @@ export class RefreshTokenInterceptor implements NestInterceptor {
 
         if (['/api/logout', '/api/reset-password'].includes(req.url)) {
           res.clearCookie('refreshToken', this.refreshTokenOptions);
-          return data;
+          return res.status(204).json(data);
         }
 
+        // NOTE: Only keep refresh token in cookies.
         if (!data.refreshToken) return data;
-
         res.cookie('refreshToken', data.refreshToken, this.refreshTokenOptions);
 
         return data;

@@ -132,7 +132,7 @@ export class AuthController {
     const refreshToken = req.cookies.refreshToken;
     const { success, message } = this.authService.verifyPrimaryRefreshToken(refreshToken);
 
-    if (!success) throw new UnauthorizedException(message);
+    if (!success) throw new UnauthorizedException('The refresh token is expired, please re-login.');
 
     const { id } = this.authService.decodeToken<RefreshTokenPayload>(refreshToken);
     const { role } = await firstValueFrom(this.userServiceClient.send('USER_GET_BY_ID', { id }));
@@ -149,7 +149,7 @@ export class AuthController {
   @ApiNoContentResponse({ description: 'Logged out.'})
   async logout(@Res() res: Response): Promise<LiteralObject> {
     // NOTE: Currently, only clean the refresh token in cookies by auth.interceptor.ts
-    return res.status(204).json({});
+    return {};
   }
 
   @Post('/reset-password')
@@ -173,7 +173,7 @@ export class AuthController {
 
     const newHashPassword = this.authService.hashPasswordFactory(newPassword, passwordSalt );
     await firstValueFrom(this.userServiceClient.send('USER_RESET_PASSWORD', { id, newHashPassword }));
-    return res.status(204).json({});
+    return {};
   }
 
   @Get('/me')
