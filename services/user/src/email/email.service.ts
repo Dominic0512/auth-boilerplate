@@ -1,44 +1,45 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, LiteralObject } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { EmailParams, MailerSend, Recipient, Sender} from 'mailersend';
+import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
 
 
 @Injectable()
 export class EmailService {
-  private readonly logger = new Logger(EmailService.name);
-  private mailerDomain: string;
-  private mailerSend: MailerSend;
-  private noReplySender: Sender;
+  private emailDomain: string;
+  private provider: SESClient;
   constructor(
     private readonly configService: ConfigService
   ) {
-    this.mailerSend = new MailerSend({ apiKey: this.configService.get('mailerSend.apiKey') });
-    this.mailerDomain = this.configService.get('mailerSend.domain');
-    this.noReplySender = new Sender(`no-reply@${this.mailerDomain}`, "No reply");
+    this.emailDomain = this.configService.get('core.emailDomain');
+    this.provider = new SESClient({
+      credentials: {
+        accessKeyId: this.configService.get<string>('aws.accessKeyId'),
+        secretAccessKey: this.configService.get<string>('aws.secretAccessKey'),
+      },
+      region: this.configService.get<string>('aws.region'),
+    });
   }
 
-  async sendEmailByTemplateId(recipient: string, templateId: string, variable: object) {
-    try {
-      const recipients = [
-        new Recipient(recipient)
-      ];
-
-      const variables = [{
-        email: recipient,
-        substitutions: Object.keys(variable).map((key) => ({ var: key, value: variable[key] }))
-      }];
-
-      const emailParams = new EmailParams()
-        .setFrom(this.noReplySender)
-        .setTo(recipients)
-        .setVariables(variables)
-        .setSubject("Email verification")
-        .setTemplateId(templateId);
-
-      const result = await this.mailerSend.email.send(emailParams);
-      this.logger.verbose(result);
-    } catch (e) {
-      this.logger.error(e);
-    }
+  async sendEmail(recipient: string, variables: LiteralObject) {
+    const { title, htmlContent } = variables;
+    const params = {
+      "Destination": {
+        "ToAddresses": [
+          recipient
+        ]
+      },
+      "Message": {
+        "Body": {
+          "Html": {
+            "Data": htmlContent
+          }
+        },
+        "Subject": {
+          "Data": title
+        }
+      },
+      "Source": `no-reply@${this.emailDomain}`,
+    };
+    return await this.provider.send(new SendEmailCommand(params));
   }
 }

@@ -14,10 +14,9 @@ export class NotificationService {
   async handleUserRegisterByPasswordEvent({ payload }: UserRegisterByPasswordEvent) {
     this.logger.verbose(`Receive ${UserRegisterByPasswordEvent.eventName} with email: ${payload.email}`);
     const { email, name, link } = payload;
-    await this.emailService.sendEmailByTemplateId(email, 'jpzkmgqnxe1g059v', {
-      name,
-      email,
-      link
+    await this.emailService.sendEmail(email, {
+      title: 'Please verify your email',
+      htmlContent: `Hi ${name}, please click the link to complete the email verification process. <a class="ulink" href="${link}" target="_blank">Go to verify</a>.`
     });
   }
 }
