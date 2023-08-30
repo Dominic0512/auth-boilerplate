@@ -1,4 +1,4 @@
-export default () => {
+export const configuration = () => {
   return {
     core: {
       nodeEnv: process.env.NODE_ENV,
@@ -18,7 +18,7 @@ export default () => {
     },
     auth0: {
       domain: process.env.AUTH0_DOMAIN,
-      kid: process.env.AUTH0_KID
-    }
+      kid: process.env.AUTH0_KID,
+    },
   };
 };

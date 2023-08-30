@@ -1,8 +1,13 @@
-import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
-import configuration from './config/configuration';
+import { configuration } from './config/configuration';
 import { AuthModule } from './auth/auth.module';
 import { RolesGuard } from './auth/auth.guard';
 import { AppController } from './app.controller';
@@ -19,11 +24,7 @@ import { ClientProxyFactory, Transport } from '@nestjs/microservices';
     }),
     AuthModule,
   ],
-  controllers: [
-    AppController,
-    AuthController,
-    UserController,
-  ],
+  controllers: [AppController, AuthController, UserController],
   providers: [
     {
       provide: APP_GUARD,
@@ -37,14 +38,13 @@ import { ClientProxyFactory, Transport } from '@nestjs/microservices';
           options: {
             host: configService.get('core.user.host'),
             port: configService.get('core.user.port'),
-          }
-        })
+          },
+        });
       },
-      inject: [ConfigService]
-    }
+      inject: [ConfigService],
+    },
   ],
 })
-
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer

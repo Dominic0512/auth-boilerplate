@@ -1,9 +1,14 @@
-import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { RoleEnum, CurrentUser } from './auth.type';
 
 const matchRoles = (roles: RoleEnum[], userRole: RoleEnum) => {
-  return roles.some(role => role === userRole);
+  return roles.some((role) => role === userRole);
 };
 
 @Injectable()
@@ -17,7 +22,7 @@ export class RolesGuard implements CanActivate {
     }
 
     const request = context.switchToHttp().getRequest();
-    const currentUser: CurrentUser = request['currentUser'];
+    const currentUser: CurrentUser = request.currentUser;
 
     if (!currentUser) {
       throw new UnauthorizedException('Invalid token.');

@@ -1,12 +1,12 @@
 export enum UserProviderEnum {
   Facebook = 'Facebook',
   Google = 'Google',
-  Primary = 'Primary'
+  Primary = 'Primary',
 }
 
 export enum UserRoleEnum {
   User = 'User',
-  Admin = 'Admin'
+  Admin = 'Admin',
 }
 
 export enum UserStateEnum {

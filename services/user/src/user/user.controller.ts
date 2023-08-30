@@ -4,9 +4,17 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import * as moment from 'moment';
 import 'moment-timezone';
 
-import { CreateUserWithPasswordDto, ResetUserPasswordDto, UpdateUserDto, UpsertUserDto } from './user.dto';
+import {
+  CreateUserWithPasswordDto,
+  ResetUserPasswordDto,
+  UpdateUserDto,
+  UpsertUserDto,
+} from './user.dto';
 import { UserProviderEnum } from '../common/enum/user.enum';
-import { UserLoggedInEvent, UserTokenRefreshedEvent } from '../common/event/user.event';
+import {
+  UserLoggedInEvent,
+  UserTokenRefreshedEvent,
+} from '../common/event/user.event';
 import { UserService } from './user.service';
 import { User } from './entities/user.entity';
 
@@ -14,74 +22,84 @@ import { User } from './entities/user.entity';
 export class UserController {
   constructor(
     private userService: UserService,
-    private eventEmitter: EventEmitter2
+    private eventEmitter: EventEmitter2,
   ) {}
 
   @MessagePattern('USER_LIST')
-  async list(){
-    return await this.userService.find();
+  list() {
+    return this.userService.find();
   }
 
   @MessagePattern('USER_GET_BY_ID')
-  async getById(@Payload() { id }): Promise<User> {
-    const user = await this.userService.findOneById(id);
-    return user;
+  getById(@Payload() { id }): Promise<User> {
+    return this.userService.findOneById(id);
   }
 
   @MessagePattern('USER_GET_BY_EMAIL')
-  async getByEmail(@Payload() { email }): Promise<User> {
-    return await this.userService.findOneByEmail(email);
+  getByEmail(@Payload() { email }): Promise<User> {
+    return this.userService.findOneByEmail(email);
   }
 
   @MessagePattern('USER_STATISTICS')
   async getStatistics() {
-    const endOfToday = moment().tz('Asia/Taipei').set('hour', 23).set('minute', 59).set('second', 59).tz('UTC').toDate();
+    const endOfToday = moment()
+      .tz('Asia/Taipei')
+      .set('hour', 23)
+      .set('minute', 59)
+      .set('second', 59)
+      .tz('UTC')
+      .toDate();
     const endOfOneDayAgo = moment(endOfToday).subtract(1, 'days').toDate();
     const endOfSevenDaysAgo = moment(endOfToday).subtract(7, 'days').toDate();
 
     const result = await Promise.all([
       this.userService.count(),
       this.userService.countActiveUsersByTimeframe(endOfOneDayAgo, endOfToday),
-      this.userService.avgActiveUsersPerDateByTimeframe(endOfSevenDaysAgo, endOfToday)
+      this.userService.avgActiveUsersPerDateByTimeframe(
+        endOfSevenDaysAgo,
+        endOfToday,
+      ),
     ]);
 
     return {
       countOfRegisterUsers: result[0],
       countOfActiveUsersByToday: result[1],
-      averageOfActiveUsersInSevenDays: result[2]
+      averageOfActiveUsersInSevenDays: result[2],
     };
   }
 
   @MessagePattern('USER_CREATE_WITH_PASSWORD')
-  async createWithPassword(@Payload() createUserWithPassword: CreateUserWithPasswordDto) {
-    return await this.userService.createWithPassword(createUserWithPassword);
+  createWithPassword(
+    @Payload() createUserWithPassword: CreateUserWithPasswordDto,
+  ) {
+    return this.userService.createWithPassword(createUserWithPassword);
   }
 
   @MessagePattern('USER_VERIFY_BY_EMAIL')
-  async verifyByEmail(@Payload() { email }: { email: string }) {
-    return await this.userService.verifyByEmail(email);
+  verifyByEmail(@Payload() { email }: { email: string }) {
+    return this.userService.verifyByEmail(email);
   }
 
   @MessagePattern('USER_UPSERT_WITH_PROVIDER')
-  async upsertWithProvider(@Payload() upsertUserDto: UpsertUserDto) {
+  upsertWithProvider(@Payload() upsertUserDto: UpsertUserDto) {
     const { providers } = upsertUserDto;
-    return await this.userService.upsertWithProvider({
+    return this.userService.upsertWithProvider({
       ...upsertUserDto,
       providers: providers.map(({ name, picture }) => ({
         name: this.userService.transformProviderName(name),
         picture,
-      }))
+      })),
     });
   }
 
   @MessagePattern('USER_RESET_PASSWORD')
-  async updatePassword(@Payload() { id, newHashPassword }: ResetUserPasswordDto) {
-    return await this.userService.updatePasswordById(id, newHashPassword);
+  updatePassword(@Payload() { id, newHashPassword }: ResetUserPasswordDto) {
+    return this.userService.updatePasswordById(id, newHashPassword);
   }
 
   @MessagePattern('USER_UPDATE_BY_ID')
-  async update(@Payload() { id, ...rest}: UpdateUserDto) {
-    return await this.userService.updateById(id, rest);
+  update(@Payload() { id, ...rest }: UpdateUserDto) {
+    return this.userService.updateById(id, rest);
   }
 
   @EventPattern('USER_LOGGED_IN')
@@ -90,7 +108,7 @@ export class UserController {
       UserLoggedInEvent.eventName,
       new UserLoggedInEvent({
         id,
-        provider: this.userService.transformProviderName(provider)
+        provider: this.userService.transformProviderName(provider),
       }),
     );
   }

@@ -1,6 +1,6 @@
 export enum RoleEnum {
   User = 'User',
-  Admin = 'Admin'
+  Admin = 'Admin',
 }
 
 export interface CurrentUser {
@@ -9,15 +9,15 @@ export interface CurrentUser {
 }
 
 export interface GenerateTokenOptions {
-  aging?: number,
-  secret?: string,
+  aging?: number;
+  secret?: string;
 }
 
 export interface EmailVerificationTokenPayload {
   email: string;
 }
 
-export interface AccessTokenPayload extends CurrentUser {}
+export type AccessTokenPayload = CurrentUser;
 export interface RefreshTokenPayload {
   id: number;
 }

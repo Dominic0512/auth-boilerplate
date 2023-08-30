@@ -6,7 +6,7 @@ import {
   Index,
   ManyToOne,
 } from 'typeorm';
-import { User } from './user.entity';
+import type { User } from './user.entity';
 
 @Entity()
 export class UserActivity {
@@ -20,7 +20,7 @@ export class UserActivity {
   @Column('simple-json', { nullable: true })
   meta: object;
 
-  @ManyToOne(() => User, (user) => user.activities)
+  @ManyToOne('User', 'activities')
   user: User;
 
   @Column()

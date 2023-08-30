@@ -9,8 +9,8 @@ import {
 import { Exclude } from 'class-transformer';
 
 import { UserStateEnum, UserRoleEnum } from '../../common/enum/user.enum';
-import { UserProvider } from './user-provider.entity';
-import { UserActivity } from './user-activity.entity';
+import type { UserProvider } from './user-provider.entity';
+import type { UserActivity } from './user-activity.entity';
 
 @Entity()
 export class User {
@@ -24,14 +24,14 @@ export class User {
   @Column({
     type: 'enum',
     enum: UserStateEnum,
-    default: UserStateEnum.Pending
+    default: UserStateEnum.Pending,
   })
   state: UserStateEnum;
 
   @Column({
     type: 'enum',
     enum: UserRoleEnum,
-    default: UserRoleEnum.User
+    default: UserRoleEnum.User,
   })
   role: UserRoleEnum;
 
@@ -49,10 +49,10 @@ export class User {
   @Exclude({ toPlainOnly: true })
   passwordSalt?: string;
 
-  @OneToMany(() => UserProvider, (provider) => provider.user, { cascade: true })
+  @OneToMany('UserProvider', 'user', { cascade: true })
   providers: UserProvider[];
 
-  @OneToMany(() => UserActivity, (activity) => activity.user, { cascade: true })
+  @OneToMany('UserActivity', 'user', { cascade: true })
   activities: UserActivity[];
 
   @CreateDateColumn()

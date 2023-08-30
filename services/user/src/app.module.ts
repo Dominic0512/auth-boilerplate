@@ -5,12 +5,11 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { createDatabase } from 'typeorm-extension';
 
-import configuration from './config/configuration';
+import { configuration } from './config/configuration';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { EmailModule } from './email/email.module';
-
 
 @Module({
   imports: [
@@ -34,7 +33,7 @@ import { EmailModule } from './email/email.module';
       }),
       dataSourceFactory: async (options: DataSourceOptions) => {
         await createDatabase({ options });
-        return await new DataSource(options).initialize();
+        return new DataSource(options).initialize();
       },
     }),
     EventEmitterModule.forRoot(),

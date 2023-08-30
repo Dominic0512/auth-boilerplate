@@ -11,42 +11,46 @@ export enum HttpMessage {
 }
 
 export interface ApiExceptionParams {
-  message?: string | ClassValidatorError[],
-  description?: string,
-  options?: ApiResponseSchemaHost
+  message?: string | ClassValidatorError[];
+  description?: string;
+  options?: ApiResponseSchemaHost;
 }
 
 export function ApiBadRequestException({
   message = HttpMessage.BadRequest,
   description = HttpMessage.BadRequest,
-  options
+  options,
 }: ApiExceptionParams = {}) {
   options = {
     ...options,
     schema: {
       ...options?.schema,
-      default: [{
-        message: HttpMessage.BadRequest,
-        date: new Date().toISOString(),
-      },
-      {
-        message: [{ property: 'property1', message: 'The property1 is invalid.'}],
-        date: new Date().toISOString(),
-      }]
-    }
+      default: [
+        {
+          message: HttpMessage.BadRequest,
+          date: new Date().toISOString(),
+        },
+        {
+          message: [
+            { property: 'property1', message: 'The property1 is invalid.' },
+          ],
+          date: new Date().toISOString(),
+        },
+      ],
+    },
   };
   return ApiExceptionDecorator<ClassValidatorError>(
     HttpStatus.BAD_REQUEST,
     message,
     description,
-    options
+    options,
   );
 }
 
 export function ApiUnauthorizedException({
   message = HttpMessage.Unauthorized,
   description = HttpMessage.Unauthorized,
-  options
+  options,
 }: ApiExceptionParams = {}) {
   return ApiExceptionDecorator(
     HttpStatus.UNAUTHORIZED,
@@ -59,7 +63,7 @@ export function ApiUnauthorizedException({
 export function ApiForbiddenException({
   message = HttpMessage.Forbidden,
   description = HttpMessage.Forbidden,
-  options
+  options,
 }: ApiExceptionParams = {}) {
   return ApiExceptionDecorator(
     HttpStatus.FORBIDDEN,
@@ -72,7 +76,7 @@ export function ApiForbiddenException({
 export function ApiInternalServerErrorException({
   message = HttpMessage.InternalServerError,
   description = HttpMessage.InternalServerError,
-  options
+  options,
 }: ApiExceptionParams = {}) {
   return ApiExceptionDecorator(
     HttpStatus.INTERNAL_SERVER_ERROR,

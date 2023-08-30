@@ -22,7 +22,7 @@ async function bootstrap() {
       bearerFormat: 'Bearer',
       scheme: 'Bearer',
       type: 'http',
-      in: 'Header'
+      in: 'Header',
     })
     .addTag('user')
     .build();
@@ -36,10 +36,13 @@ async function bootstrap() {
   app.use(cookieParser());
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalPipes(new ClassValidatorPipe());
-  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector), { strategy: "excludeAll" }));
+  app.useGlobalInterceptors(
+    new ClassSerializerInterceptor(app.get(Reflector), {
+      strategy: 'excludeAll',
+    }),
+  );
 
   await app.listen(8000);
 }
 
 bootstrap();
-

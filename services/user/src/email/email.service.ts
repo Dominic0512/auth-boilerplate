@@ -1,15 +1,14 @@
 import { Injectable, LiteralObject } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
-
+import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
 
 @Injectable()
 export class EmailService {
   private emailDomain: string;
+
   private provider: SESClient;
-  constructor(
-    private readonly configService: ConfigService
-  ) {
+
+  constructor(private readonly configService: ConfigService) {
     this.emailDomain = this.configService.get('core.emailDomain');
     this.provider = new SESClient({
       credentials: {
@@ -23,23 +22,21 @@ export class EmailService {
   async sendEmail(recipient: string, variables: LiteralObject) {
     const { title, htmlContent } = variables;
     const params = {
-      "Destination": {
-        "ToAddresses": [
-          recipient
-        ]
+      Destination: {
+        ToAddresses: [recipient],
       },
-      "Message": {
-        "Body": {
-          "Html": {
-            "Data": htmlContent
-          }
+      Message: {
+        Body: {
+          Html: {
+            Data: htmlContent,
+          },
         },
-        "Subject": {
-          "Data": title
-        }
+        Subject: {
+          Data: title,
+        },
       },
-      "Source": `no-reply@${this.emailDomain}`,
+      Source: `no-reply@${this.emailDomain}`,
     };
-    return await this.provider.send(new SendEmailCommand(params));
+    return this.provider.send(new SendEmailCommand(params));
   }
 }

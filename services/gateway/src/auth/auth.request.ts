@@ -1,6 +1,6 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsStrongPassword } from "class-validator";
-import { IsValidAuth0Token } from "./auth.validator";
+import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail, IsStrongPassword } from 'class-validator';
+import { IsValidAuth0Token } from './auth.validator';
 
 export class AuthByAuth0Request {
   @IsValidAuth0Token()
@@ -8,7 +8,7 @@ export class AuthByAuth0Request {
 }
 
 // TODO: Improve error message for IsStrongPassword validator.
-const passwordDescription =  `
+const passwordDescription = `
   The password must be validated by the following conditions. \n
   - contains at least one lower character \n
   - contains at least one upper character \n
@@ -24,14 +24,14 @@ export const passwordRules = {
   minNumbers: 1,
   minSymbols: 1,
   minLength: 8,
-}
+};
 
-export class RegisterRequest  {
+export class RegisterRequest {
   @ApiProperty()
   @IsEmail()
   email: string;
 
-  @ApiProperty({ description: passwordDescription})
+  @ApiProperty({ description: passwordDescription })
   @IsStrongPassword(passwordRules)
   password: string;
 }
@@ -42,7 +42,6 @@ export class VerifyRequest {
 }
 
 export class LoginRequest extends RegisterRequest {}
-
 
 export class AuthByIdTokenRequest extends AuthByAuth0Request {
   @ApiProperty()

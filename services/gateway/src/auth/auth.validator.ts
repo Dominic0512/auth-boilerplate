@@ -10,7 +10,9 @@ import { AuthService } from './auth.service';
 
 @ValidatorConstraint({ name: 'IsValidAuth0Token' })
 @Injectable()
-export class IsValidAuth0TokenConstraint implements ValidatorConstraintInterface {
+export class IsValidAuth0TokenConstraint
+  implements ValidatorConstraintInterface
+{
   constructor(private authService: AuthService) {}
 
   validate(token: string) {
@@ -25,7 +27,7 @@ export class IsValidAuth0TokenConstraint implements ValidatorConstraintInterface
 }
 
 export function IsValidAuth0Token(validationOptions?: ValidationOptions) {
-  return function(object: unknown, propertyName: string) {
+  return function (object: unknown, propertyName: string) {
     registerDecorator({
       target: object.constructor,
       propertyName: propertyName,

@@ -1,4 +1,13 @@
-import { ArrayNotEmpty, IsBase64, IsEmail, IsEnum, IsHash, IsJWT, IsStrongPassword, IsUrl, MinLength } from 'class-validator';
+import {
+  ArrayNotEmpty,
+  IsBase64,
+  IsEmail,
+  IsEnum,
+  IsHash,
+  IsJWT,
+  IsUrl,
+  MinLength,
+} from 'class-validator';
 
 import { UserProviderEnum } from '../common/enum/user.enum';
 
@@ -8,7 +17,7 @@ export const passwordRules = {
   minNumbers: 1,
   minSymbols: 1,
   minLength: 8,
-}
+};
 
 export class ProviderDto {
   @IsEnum(UserProviderEnum)
@@ -62,4 +71,3 @@ export class UpdateUserDto extends ManipulateUserDto {
   @MinLength(1)
   name?: string;
 }
-

@@ -1,12 +1,7 @@
-import {
-  Entity,
-  Column,
-  ManyToOne,
-  PrimaryColumn
-} from 'typeorm';
+import { Entity, Column, ManyToOne, PrimaryColumn } from 'typeorm';
 
 import { UserProviderEnum } from '../../common/enum/user.enum';
-import { User } from './user.entity';
+import type { User } from './user.entity';
 
 @Entity()
 export class UserProvider {
@@ -20,7 +15,7 @@ export class UserProvider {
   @Column()
   picture: string;
 
-  @ManyToOne(() => User, (user) => user.providers)
+  @ManyToOne('User', 'providers')
   user: User;
 
   @PrimaryColumn()

@@ -1,19 +1,20 @@
-import {
-  Controller,
-  Get,
-  Inject,
-  LiteralObject,
-  Param,
-} from '@nestjs/common';
+import { Controller, Get, Inject, LiteralObject, Param } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { firstValueFrom } from 'rxjs';
 
-import { ApiForbiddenException, ApiUnauthorizedException } from './common/swagger';
+import {
+  ApiForbiddenException,
+  ApiUnauthorizedException,
+} from './common/swagger';
 import { ApiBearAuthWithRoles } from './auth/auth.decorator';
 import { RoleEnum } from './auth/auth.type';
 
-import { InternalUserDto, ManipulateUserDto, UserStatisticsDto } from './dto/user.dto';
+import {
+  InternalUserDto,
+  ManipulateUserDto,
+  UserStatisticsDto,
+} from './dto/user.dto';
 
 @ApiTags('user')
 @Controller('user')
@@ -24,28 +25,47 @@ export class UserController {
 
   @Get()
   @ApiBearAuthWithRoles([RoleEnum.Admin])
-  @ApiOkResponse({ type: InternalUserDto, isArray: true, description: 'Receive user list.'})
+  @ApiOkResponse({
+    type: InternalUserDto,
+    isArray: true,
+    description: 'Receive user list.',
+  })
   @ApiUnauthorizedException()
   @ApiForbiddenException()
   async list(): Promise<InternalUserDto[]> {
-    return (await firstValueFrom(this.userServiceClient.send('USER_LIST', {}))).map((item: LiteralObject) => new InternalUserDto(item));
+    return (
+      await firstValueFrom(this.userServiceClient.send('USER_LIST', {}))
+    ).map((item: LiteralObject) => new InternalUserDto(item));
   }
 
   @Get('/statistics')
   @ApiBearAuthWithRoles([RoleEnum.Admin])
-  @ApiOkResponse({ type: UserStatisticsDto, description: 'Receive basic user statistics.'})
+  @ApiOkResponse({
+    type: UserStatisticsDto,
+    description: 'Receive basic user statistics.',
+  })
   @ApiUnauthorizedException()
   @ApiForbiddenException()
   async statistics(): Promise<UserStatisticsDto> {
-    return new UserStatisticsDto(await firstValueFrom(this.userServiceClient.send('USER_STATISTICS', {})));
+    return new UserStatisticsDto(
+      await firstValueFrom(this.userServiceClient.send('USER_STATISTICS', {})),
+    );
   }
 
   @Get('/:id/profile')
   @ApiBearAuthWithRoles([RoleEnum.Admin])
-  @ApiOkResponse({ type: InternalUserDto, isArray: true, description: 'Receive basic user statistics.'})
+  @ApiOkResponse({
+    type: InternalUserDto,
+    isArray: true,
+    description: 'Receive basic user statistics.',
+  })
   @ApiUnauthorizedException()
   @ApiForbiddenException()
   async profile(@Param() { id }: ManipulateUserDto) {
-    return new InternalUserDto(await firstValueFrom(this.userServiceClient.send('USER_GET_BY_ID', { id })));
+    return new InternalUserDto(
+      await firstValueFrom(
+        this.userServiceClient.send('USER_GET_BY_ID', { id }),
+      ),
+    );
   }
 }
