@@ -29,7 +29,7 @@ import { EmailModule } from './email/email.module';
         username: configService.get<string>('database.username'),
         password: configService.get<string>('database.password'),
         ssl: configService.get<boolean>('database.ssl'),
-        synchronize: true,
+        synchronize: true, // TODO: To detch node env once we build the migration mechanism.
         autoLoadEntities: true,
       }),
       dataSourceFactory: async (options: DataSourceOptions) => {
