@@ -13,7 +13,7 @@ import { ApiForbiddenException, ApiUnauthorizedException } from './common/swagge
 import { ApiBearAuthWithRoles } from './auth/auth.decorator';
 import { RoleEnum } from './auth/auth.type';
 
-import { ManipulateUserDto, UserDto, UserStatisticsDto } from './dto/user.dto';
+import { InternalUserDto, ManipulateUserDto, UserStatisticsDto } from './dto/user.dto';
 
 @ApiTags('user')
 @Controller('user')
@@ -24,11 +24,11 @@ export class UserController {
 
   @Get()
   @ApiBearAuthWithRoles([RoleEnum.Admin])
-  @ApiOkResponse({ type: UserDto, isArray: true, description: 'Receive user list.'})
+  @ApiOkResponse({ type: InternalUserDto, isArray: true, description: 'Receive user list.'})
   @ApiUnauthorizedException()
   @ApiForbiddenException()
-  async list(): Promise<UserDto[]> {
-    return (await firstValueFrom(this.userServiceClient.send('USER_LIST', {}))).map((item: LiteralObject) => new UserDto(item));
+  async list(): Promise<InternalUserDto[]> {
+    return (await firstValueFrom(this.userServiceClient.send('USER_LIST', {}))).map((item: LiteralObject) => new InternalUserDto(item));
   }
 
   @Get('/statistics')
@@ -42,10 +42,10 @@ export class UserController {
 
   @Get('/:id/profile')
   @ApiBearAuthWithRoles([RoleEnum.Admin])
-  @ApiOkResponse({ type: UserDto, isArray: true, description: 'Receive basic user statistics.'})
+  @ApiOkResponse({ type: InternalUserDto, isArray: true, description: 'Receive basic user statistics.'})
   @ApiUnauthorizedException()
   @ApiForbiddenException()
   async profile(@Param() { id }: ManipulateUserDto) {
-    return new UserDto(await firstValueFrom(this.userServiceClient.send('USER_GET_BY_ID', { id })));
+    return new InternalUserDto(await firstValueFrom(this.userServiceClient.send('USER_GET_BY_ID', { id })));
   }
 }

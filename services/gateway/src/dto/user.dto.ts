@@ -6,6 +6,10 @@ export class ManipulateUserDto {
   @ApiProperty()
   id: number;
 }
+export class UpdateMyNameDto {
+  @ApiProperty()
+  name: string;
+}
 
 export class UserDto extends BaseDto<UserDto> {
   @ApiProperty()

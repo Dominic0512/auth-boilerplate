@@ -8,16 +8,16 @@ import {
   Inject,
   Get,
   Req,
-  ForbiddenException,
   LiteralObject,
   Res,
+  Put,
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 import { Request, Response } from 'express';
 
-import { ApiBadRequestException, ApiForbiddenException, ApiUnauthorizedException } from './common/swagger';
+import { ApiBadRequestException, ApiUnauthorizedException } from './common/swagger';
 import { AuthService } from './auth/auth.service';
 import { RequestWithCurrentUser } from './auth/middleware';
 import { ApiBearAuthWithRoles } from './auth/auth.decorator';
@@ -25,7 +25,7 @@ import { EmailVerificationTokenPayload, RefreshTokenPayload, RoleEnum } from './
 import { TokenResponse } from './auth/auth.response';
 import { LoginRequest, AuthByIdTokenRequest, RegisterRequest, VerifyRequest, ResetPasswordRequest } from './auth/auth.request';
 import { RefreshTokenInterceptor } from './auth/interceptor';
-import { UserDto } from './dto/user.dto';
+import { UserDto, UpdateMyNameDto } from './dto/user.dto';
 
 export enum UserStateEnum {
   Pending = 'Pending',
@@ -96,12 +96,6 @@ export class AuthController {
 
     this.userServiceClient.emit('USER_LOGGED_IN', { id });
 
-    const result = new TokenResponse({
-      accessToken: this.authService.generateAccessToken({ id, role }),
-      refreshToken: this.authService.generateRefreshToken({ id })
-    });
-    console.log(result);
-
     return new TokenResponse({
       accessToken: this.authService.generateAccessToken({ id, role }),
       refreshToken: this.authService.generateRefreshToken({ id })
@@ -133,12 +127,12 @@ export class AuthController {
 
   @Post('/refresh-token')
   @ApiCreatedResponse({ type: TokenResponse, description: "Authorization by OIDC is accepted." })
-  @ApiForbiddenException()
+  @ApiUnauthorizedException()
   async refreshToken(@Req() req: Request): Promise<TokenResponse> {
     const refreshToken = req.cookies.refreshToken;
     const { success, message } = this.authService.verifyPrimaryRefreshToken(refreshToken);
 
-    if (!success) throw new ForbiddenException(message);
+    if (!success) throw new UnauthorizedException(message);
 
     const { id } = this.authService.decodeToken<RefreshTokenPayload>(refreshToken);
     const { role } = await firstValueFrom(this.userServiceClient.send('USER_GET_BY_ID', { id }));
@@ -186,9 +180,17 @@ export class AuthController {
   @ApiOkResponse({ type: UserDto, description: 'Get personal profiles.' })
   @ApiBearAuthWithRoles([RoleEnum.User, RoleEnum.Admin])
   @ApiUnauthorizedException()
-  @ApiForbiddenException()
   async me(@Req() req: RequestWithCurrentUser): Promise<UserDto> {
     const { id } = req.currentUser;
     return new UserDto(await firstValueFrom(this.userServiceClient.send('USER_GET_BY_ID', { id })));
+  }
+
+  @Put('/username')
+  @ApiBearAuthWithRoles([RoleEnum.User, RoleEnum.Admin])
+  @ApiOkResponse({ type: UserDto, description: 'Receive updated user name.'})
+  @ApiUnauthorizedException()
+  async updateMyName(@Req() req: RequestWithCurrentUser, @Body() { name }: UpdateMyNameDto): Promise<UpdateMyNameDto> {
+    const { id } = req.currentUser;
+    return new UserDto(await firstValueFrom(this.userServiceClient.send('USER_UPDATE_BY_ID', { id, name })));
   }
 }

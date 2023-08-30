@@ -54,3 +54,12 @@ export class ResetUserPasswordDto {
   newHashPassword: string;
 }
 
+export class ManipulateUserDto {
+  id: number;
+}
+
+export class UpdateUserDto extends ManipulateUserDto {
+  @MinLength(1)
+  name?: string;
+}
+

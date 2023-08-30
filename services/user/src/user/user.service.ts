@@ -8,7 +8,7 @@ import { UserRegisterByPasswordEvent } from '../common/event/user.event';
 import { UserProviderEnum, UserStateEnum } from '../common/enum/user.enum';
 import { User } from './entities/user.entity';
 import { UserProvider } from './entities/user-provider.entity';
-import { CreateUserWithPasswordDto, ProviderDto, UpsertUserDto } from './user.dto';
+import { CreateUserWithPasswordDto, ProviderDto, UpdateUserDto, UpsertUserDto } from './user.dto';
 
 @Injectable()
 export class UserService {
@@ -143,5 +143,14 @@ export class UserService {
         password,
       },
     );
+  }
+
+  async updateById(id: number, updateUserDto: Omit<UpdateUserDto, 'id'>) {
+    const user = await this.findOneById(id);
+
+    return this.userRepository.save({
+      ...user,
+      ...updateUserDto
+    });
   }
 }

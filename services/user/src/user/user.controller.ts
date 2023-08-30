@@ -4,7 +4,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import * as moment from 'moment';
 import 'moment-timezone';
 
-import { CreateUserWithPasswordDto, ResetUserPasswordDto, UpsertUserDto } from './user.dto';
+import { CreateUserWithPasswordDto, ResetUserPasswordDto, UpdateUserDto, UpsertUserDto } from './user.dto';
 import { UserProviderEnum } from '../common/enum/user.enum';
 import { UserLoggedInEvent, UserTokenRefreshedEvent } from '../common/event/user.event';
 import { UserService } from './user.service';
@@ -25,7 +25,6 @@ export class UserController {
   @MessagePattern('USER_GET_BY_ID')
   async getById(@Payload() { id }): Promise<User> {
     const user = await this.userService.findOneById(id);
-    console.log('USER CONTROLLOER', user.constructor.name);
     return user;
   }
 
@@ -78,6 +77,11 @@ export class UserController {
   @MessagePattern('USER_RESET_PASSWORD')
   async updatePassword(@Payload() { id, newHashPassword }: ResetUserPasswordDto) {
     return await this.userService.updatePasswordById(id, newHashPassword);
+  }
+
+  @MessagePattern('USER_UPDATE_BY_ID')
+  async update(@Payload() { id, ...rest}: UpdateUserDto) {
+    return await this.userService.updateById(id, rest);
   }
 
   @EventPattern('USER_LOGGED_IN')
