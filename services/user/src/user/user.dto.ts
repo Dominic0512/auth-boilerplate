@@ -11,14 +11,6 @@ import {
 
 import { UserProviderEnum } from '../common/enum/user.enum';
 
-export const passwordRules = {
-  minLowercase: 1,
-  minUppercase: 1,
-  minNumbers: 1,
-  minSymbols: 1,
-  minLength: 8,
-};
-
 export class ProviderDto {
   @IsEnum(UserProviderEnum)
   name: UserProviderEnum;

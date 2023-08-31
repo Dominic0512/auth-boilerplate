@@ -8,7 +8,7 @@ export class AuthByAuth0Request {
 }
 
 // TODO: Improve error message for IsStrongPassword validator.
-const passwordDescription = `
+const passwordRuleDescription = `
   The password must be validated by the following conditions. \n
   - contains at least one lower character \n
   - contains at least one upper character \n
@@ -17,7 +17,6 @@ const passwordDescription = `
   - contains at least 8 characters
 `;
 
-// TODO: Let it be shared between uth and user service.
 export const passwordRules = {
   minLowercase: 1,
   minUppercase: 1,
@@ -31,7 +30,7 @@ export class RegisterRequest {
   @IsEmail()
   email: string;
 
-  @ApiProperty({ description: passwordDescription })
+  @ApiProperty({ description: passwordRuleDescription })
   @IsStrongPassword(passwordRules)
   password: string;
 }
@@ -49,11 +48,11 @@ export class AuthByIdTokenRequest extends AuthByAuth0Request {
 }
 
 export class ResetPasswordRequest {
-  @ApiProperty({ description: passwordDescription })
+  @ApiProperty({ description: passwordRuleDescription })
   @IsStrongPassword(passwordRules)
   oldPassword: string;
 
-  @ApiProperty({ description: passwordDescription })
+  @ApiProperty({ description: passwordRuleDescription })
   @IsStrongPassword(passwordRules)
   newPassword: string;
 }

@@ -44,6 +44,8 @@ import {
 import { RefreshTokenInterceptor } from './auth/interceptor';
 import { UserDto, UpdateMyNameDto } from './dto/user.dto';
 
+
+// TODO: Let it be shared between gateway and user service.
 export enum UserStateEnum {
   Pending = 'Pending',
   Verified = 'Verified',
