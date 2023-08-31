@@ -1,8 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { Transport, MicroserviceOptions } from '@nestjs/microservices';
 
-import { AppModule } from './app.module';
 import { ClassValidatorPipe } from './common/pipe/class-validator.pipe';
+import { AppModule } from './app.module';
 import { configuration } from './config/configuration';
 
 async function bootstrap() {
@@ -16,8 +16,7 @@ async function bootstrap() {
       },
     },
   );
-  await app.listen();
-
   app.useGlobalPipes(new ClassValidatorPipe());
+  await app.listen();
 }
 bootstrap();

@@ -2,10 +2,10 @@ import {
   PipeTransform,
   Injectable,
   ArgumentMetadata,
-  BadRequestException,
 } from '@nestjs/common';
-import { validate } from 'class-validator';
+import { validate, ValidationError } from 'class-validator';
 import { plainToInstance } from 'class-transformer';
+import { RpcException } from '@nestjs/microservices';
 
 export interface ClassValidatorError {
   property: string;
@@ -23,14 +23,15 @@ export class ClassValidatorPipe implements PipeTransform<any> {
     const errors = await validate(object);
 
     if (errors.length > 0) {
-      throw new BadRequestException(
-        errors.map(
+      throw new RpcException({
+        type: ValidationError.name,
+        errors: errors.map(
           (error): ClassValidatorError => ({
             property: error.property,
             message: error.constraints[Object.keys(error.constraints)[0]],
           }),
         ),
-      );
+      });
     }
 
     return value;

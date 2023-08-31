@@ -1,13 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose } from 'class-transformer';
-import { BaseDto } from 'src/common/dto/base.dto';
+import { IsNumber, MinLength } from 'class-validator';
+
+import { BaseDto } from '../common/dto/base.dto';
 
 export class ManipulateUserDto {
   @ApiProperty()
+  @IsNumber()
   id: number;
 }
 export class UpdateMyNameDto {
   @ApiProperty()
+  @MinLength(1)
   name: string;
 }
 

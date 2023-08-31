@@ -3,8 +3,8 @@ import {
   IsBase64,
   IsEmail,
   IsEnum,
-  IsHash,
   IsJWT,
+  IsNumber,
   IsUrl,
   MinLength,
 } from 'class-validator';
@@ -45,7 +45,8 @@ export class CreateUserWithPasswordDto {
   @IsEmail()
   email: string;
 
-  @IsHash('sha256')
+  @IsBase64()
+  @IsEmail()
   password: string;
 
   @IsBase64()
@@ -56,14 +57,18 @@ export class CreateUserWithPasswordDto {
 }
 
 export class ResetUserPasswordDto {
+  @IsNumber()
   id: number;
 
+  @IsBase64()
   oldHashPassword: string;
 
+  @IsBase64()
   newHashPassword: string;
 }
 
 export class ManipulateUserDto {
+  @IsNumber()
   id: number;
 }
 
