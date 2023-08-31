@@ -30,8 +30,8 @@ export class RefreshTokenInterceptor implements NestInterceptor {
         const res = context.switchToHttp().getResponse<Response>();
 
         if (['/api/logout', '/api/reset-password'].includes(req.url)) {
-          res.clearCookie('refreshToken', this.refreshTokenOptions);
-          return res.status(204).json(data);
+          res.clearCookie('refreshToken', this.refreshTokenOptions).status(204);
+          return data;
         }
 
         // NOTE: Only keep refresh token in cookies.
