@@ -60,9 +60,6 @@ export class ResetUserPasswordDto {
   id: number;
 
   @IsBase64()
-  oldHashPassword: string;
-
-  @IsBase64()
   newHashPassword: string;
 }
 
