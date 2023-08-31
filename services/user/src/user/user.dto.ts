@@ -46,7 +46,6 @@ export class CreateUserWithPasswordDto {
   email: string;
 
   @IsBase64()
-  @IsEmail()
   password: string;
 
   @IsBase64()
