@@ -35,7 +35,8 @@ export class RefreshTokenInterceptor implements NestInterceptor {
         }
 
         // NOTE: Only keep refresh token in cookies.
-        if (!data.refreshToken) return data;
+        if (!data || !data.refreshToken) return data;
+
         res.cookie('refreshToken', data.refreshToken, this.refreshTokenOptions);
 
         return data;
