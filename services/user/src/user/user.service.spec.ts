@@ -1,12 +1,12 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { getRepositoryToken } from '@nestjs/typeorm';
+import { Test, TestingModule } from "@nestjs/testing";
+import { getRepositoryToken } from "@nestjs/typeorm";
 
-import { UserProviderEnum } from '../common/enum/user.enum';
-import { UserService } from './user.service';
-import { User } from './entities/user.entity';
-import type { UpsertUserDto } from './user.dto';
+import { UserProviderEnum } from "../common/enum/user.enum";
+import { UserService } from "./user.service";
+import { User } from "./entities/user.entity";
+import type { UpsertUserDto } from "./user.dto";
 
-describe('UserService', () => {
+describe("UserService", () => {
   let service: UserService;
 
   beforeEach(async () => {
@@ -35,24 +35,24 @@ describe('UserService', () => {
     service = module.get<UserService>(UserService);
   });
 
-  it('UserService should be defined', () => {
+  it("UserService should be defined", () => {
     expect(service).toBeDefined();
   });
 
-  it('Create user', async () => {
+  it("Create user", async () => {
     const upsertUserDto = {
-      name: 'tester1',
-      email: 'tester1@gmail.com',
+      name: "tester1",
+      email: "tester1@gmail.com",
       providers: [
         {
           name: UserProviderEnum.Primary,
-          picture: 'https://i0.wp.com/cdn.auth0.com/avatars/te.png?ssl=1',
+          picture: "https://i0.wp.com/cdn.auth0.com/avatars/te.png?ssl=1",
         },
       ],
     };
     const user = await service.upsertWithProvider(upsertUserDto);
-    expect(user).toHaveProperty('id');
-    expect(user).toHaveProperty('createdAt');
-    expect(user).toHaveProperty('updatedAt');
+    expect(user).toHaveProperty("id");
+    expect(user).toHaveProperty("createdAt");
+    expect(user).toHaveProperty("updatedAt");
   });
 });

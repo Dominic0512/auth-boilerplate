@@ -13,7 +13,7 @@ export const configuration = () => {
       name: process.env.DATABASE_NAME,
       username: process.env.DATABASE_USER,
       password: process.env.DATABASE_PASSWORD,
-      ssl: process.env.DATABASE_SSL === 'true',
+      ssl: process.env.DATABASE_SSL === "true",
     },
     aws: {
       accessKeyId: process.env.AWS_ACCESS_KEY_ID,

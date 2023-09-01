@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { ClassValidatorError } from '../pipe/class-validator.pipe';
+import { ApiProperty } from "@nestjs/swagger";
+import { ClassValidatorError } from "../pipe/class-validator.pipe";
 
 export class ExceptionDto {
   @ApiProperty()

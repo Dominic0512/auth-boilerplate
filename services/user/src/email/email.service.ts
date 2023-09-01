@@ -1,6 +1,6 @@
-import { Injectable, LiteralObject } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
+import { Injectable, LiteralObject } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
 
 @Injectable()
 export class EmailService {
@@ -9,13 +9,13 @@ export class EmailService {
   private provider: SESClient;
 
   constructor(private readonly configService: ConfigService) {
-    this.emailDomain = this.configService.get('core.emailDomain');
+    this.emailDomain = this.configService.get("core.emailDomain");
     this.provider = new SESClient({
       credentials: {
-        accessKeyId: this.configService.get<string>('aws.accessKeyId'),
-        secretAccessKey: this.configService.get<string>('aws.secretAccessKey'),
+        accessKeyId: this.configService.get<string>("aws.accessKeyId"),
+        secretAccessKey: this.configService.get<string>("aws.secretAccessKey"),
       },
-      region: this.configService.get<string>('aws.region'),
+      region: this.configService.get<string>("aws.region"),
     });
   }
 

@@ -66,11 +66,11 @@ docker-compose -f ./docker/docker-compose.general.yml
 > Please running the database by 3rd-party SaaS provider to save your time, such as [Cockroach Lab](https://www.cockroachlabs.com).
 
 # Future works
-1. [ ] Typeorm migrations mechanism
-2. [ ] Pull out the shared packages for services ex: Entity type, helpers ......etc
-3. [ ] Implement ECS deployment via Terraform
-4. [ ] CI/CD auto deployment
-5. [ ] Client site via NextJS
-6. [ ] Admin portal via NextJS or headless CMS
-7. [ ] Add hursky to automatically execute lint, prettier command.
-8. [ ] Build shared eslint file for multiple services.
+1. [X] Add hursky to automatically execute lint, prettier command.
+2. [X] Build shared eslint file for multiple services.
+3. [ ] Typeorm migrations mechanism
+4. [ ] Pull out the shared packages for services ex: Entity type, helpers ......etc
+5. [ ] CI/CD auto deployment
+6. [ ] Implement ECS deployment via Terraform
+7. [ ] Client site via NextJS
+8. [ ] Admin portal via NextJS or headless CMS

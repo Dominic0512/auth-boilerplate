@@ -7,9 +7,9 @@ import {
   IsNumber,
   IsUrl,
   MinLength,
-} from 'class-validator';
+} from "class-validator";
 
-import { UserProviderEnum } from '../common/enum/user.enum';
+import { UserProviderEnum } from "../common/enum/user.enum";
 
 export class ProviderDto {
   @IsEnum(UserProviderEnum)

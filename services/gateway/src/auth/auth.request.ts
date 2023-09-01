@@ -1,6 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsStrongPassword } from 'class-validator';
-import { IsValidAuth0Token } from './auth.validator';
+import { ApiProperty } from "@nestjs/swagger";
+import { IsEmail, IsStrongPassword } from "class-validator";
+import { IsValidAuth0Token } from "./auth.validator";
 
 export class AuthByAuth0Request {
   @IsValidAuth0Token()

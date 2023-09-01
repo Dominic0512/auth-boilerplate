@@ -3,9 +3,9 @@ import {
   CanActivate,
   ExecutionContext,
   UnauthorizedException,
-} from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
-import { RoleEnum, CurrentUser } from './auth.type';
+} from "@nestjs/common";
+import { Reflector } from "@nestjs/core";
+import { RoleEnum, CurrentUser } from "./auth.type";
 
 const matchRoles = (roles: RoleEnum[], userRole: RoleEnum) => {
   return roles.some((role) => role === userRole);
@@ -16,7 +16,7 @@ export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const roles = this.reflector.get<RoleEnum[]>('roles', context.getHandler());
+    const roles = this.reflector.get<RoleEnum[]>("roles", context.getHandler());
     if (!roles) {
       return true;
     }
@@ -25,7 +25,7 @@ export class RolesGuard implements CanActivate {
     const currentUser: CurrentUser = request.currentUser;
 
     if (!currentUser) {
-      throw new UnauthorizedException('Invalid token.');
+      throw new UnauthorizedException("Invalid token.");
     }
 
     return matchRoles(roles, currentUser.role);
