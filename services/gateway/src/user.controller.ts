@@ -7,17 +7,17 @@ import {
   LiteralObject,
   Param,
   Body,
-} from "@nestjs/common";
-import { ClientProxy } from "@nestjs/microservices";
-import { ApiOkResponse, ApiTags } from "@nestjs/swagger";
-import { firstValueFrom } from "rxjs";
+} from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { firstValueFrom } from 'rxjs';
 
 import {
   ApiForbiddenException,
   ApiUnauthorizedException,
-} from "./common/swagger";
-import { ApiBearAuthWithRoles } from "./auth/auth.decorator";
-import { RoleEnum } from "./auth/auth.type";
+} from './common/swagger';
+import { ApiBearAuthWithRoles } from './auth/auth.decorator';
+import { RoleEnum } from './auth/auth.type';
 
 import {
   InternalUserDto,
@@ -25,13 +25,13 @@ import {
   UserStatisticsDto,
   UpdateInternalUserDto,
   PartialUpdateInternalUserDto,
-} from "./dto/user.dto";
+} from './dto/user.dto';
 
-@ApiTags("user")
-@Controller("user")
+@ApiTags('user')
+@Controller('user')
 export class UserController {
   constructor(
-    @Inject("USER_SERVICE") private readonly userServiceClient: ClientProxy
+    @Inject('USER_SERVICE') private readonly userServiceClient: ClientProxy,
   ) {}
 
   @Get()
@@ -39,88 +39,88 @@ export class UserController {
   @ApiOkResponse({
     type: InternalUserDto,
     isArray: true,
-    description: "Receive user list.",
+    description: 'Receive user list.',
   })
   @ApiUnauthorizedException()
   @ApiForbiddenException()
   async list(): Promise<InternalUserDto[]> {
     return (
-      await firstValueFrom(this.userServiceClient.send("USER_LIST", {}))
+      await firstValueFrom(this.userServiceClient.send('USER_LIST', {}))
     ).map((item: LiteralObject) => new InternalUserDto(item));
   }
 
-  @Get("/statistics")
+  @Get('/statistics')
   @ApiBearAuthWithRoles([RoleEnum.Admin])
   @ApiOkResponse({
     type: UserStatisticsDto,
-    description: "Receive basic user statistics.",
+    description: 'Receive basic user statistics.',
   })
   @ApiUnauthorizedException()
   @ApiForbiddenException()
   async statistics(): Promise<UserStatisticsDto> {
     return new UserStatisticsDto(
-      await firstValueFrom(this.userServiceClient.send("USER_STATISTICS", {}))
+      await firstValueFrom(this.userServiceClient.send('USER_STATISTICS', {})),
     );
   }
 
-  @Get("/:id")
+  @Get('/:id')
   @ApiBearAuthWithRoles([RoleEnum.Admin])
   @ApiOkResponse({
     type: InternalUserDto,
     isArray: true,
-    description: "Receive basic user information.",
+    description: 'Receive basic user information.',
   })
   @ApiUnauthorizedException()
   @ApiForbiddenException()
   async profile(@Param() { id }: ManipulateUserDto) {
     return new InternalUserDto(
       await firstValueFrom(
-        this.userServiceClient.send("USER_GET_BY_ID", { id })
-      )
+        this.userServiceClient.send('USER_GET_BY_ID', { id }),
+      ),
     );
   }
 
-  @Put("/:id")
+  @Put('/:id')
   @ApiBearAuthWithRoles([RoleEnum.Admin])
   @ApiOkResponse({
     type: InternalUserDto,
-    description: "Whole user information is updated.",
+    description: 'Whole user information is updated.',
   })
   @ApiUnauthorizedException()
   @ApiForbiddenException()
   async update(
     @Param() { id }: ManipulateUserDto,
-    @Body() updateInternalUserDto: UpdateInternalUserDto
+    @Body() updateInternalUserDto: UpdateInternalUserDto,
   ) {
     return new InternalUserDto(
       await firstValueFrom(
-        this.userServiceClient.send("USER_UPDATE_BY_ID", {
+        this.userServiceClient.send('USER_UPDATE_BY_ID', {
           id,
           ...updateInternalUserDto,
-        })
-      )
+        }),
+      ),
     );
   }
 
-  @Patch("/:id")
+  @Patch('/:id')
   @ApiBearAuthWithRoles([RoleEnum.Admin])
   @ApiOkResponse({
     type: InternalUserDto,
-    description: "Partial user information is updated.",
+    description: 'Partial user information is updated.',
   })
   @ApiUnauthorizedException()
   @ApiForbiddenException()
   async partialUpdate(
     @Param() { id }: ManipulateUserDto,
-    @Body() partialUpdateInternalUserDto: PartialUpdateInternalUserDto
+    @Body() partialUpdateInternalUserDto: PartialUpdateInternalUserDto,
   ) {
     return new InternalUserDto(
       await firstValueFrom(
-        this.userServiceClient.send("USER_UPDATE_BY_ID", {
+        this.userServiceClient.send('USER_UPDATE_BY_ID', {
           id,
           ...partialUpdateInternalUserDto,
-        })
-      )
+        }),
+      ),
     );
   }
 }

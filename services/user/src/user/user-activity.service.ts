@@ -1,14 +1,14 @@
-import { Injectable, Logger } from "@nestjs/common";
-import { InjectRepository, InjectEntityManager } from "@nestjs/typeorm";
-import { OnEvent } from "@nestjs/event-emitter";
-import { EntityManager, Repository } from "typeorm";
+import { Injectable, Logger } from '@nestjs/common';
+import { InjectRepository, InjectEntityManager } from '@nestjs/typeorm';
+import { OnEvent } from '@nestjs/event-emitter';
+import { EntityManager, Repository } from 'typeorm';
 
 import {
   UserLoggedInEvent,
   UserTokenRefreshedEvent,
-} from "../common/event/user.event";
-import { User } from "./entities/user.entity";
-import { UserActivity } from "./entities/user-activity.entity";
+} from '../common/event/user.event';
+import { User } from './entities/user.entity';
+import { UserActivity } from './entities/user-activity.entity';
 
 @Injectable()
 export class UserActivityService {
@@ -18,14 +18,14 @@ export class UserActivityService {
     @InjectEntityManager() private entityManger: EntityManager,
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(UserActivity)
-    private userActivityRepository: Repository<UserActivity>
+    private userActivityRepository: Repository<UserActivity>,
   ) {}
 
   @OnEvent(UserLoggedInEvent.eventName, { async: true })
   async handleUserLoggedInEvent({ payload }: UserLoggedInEvent) {
     const { id: userId, ...meta } = payload;
     this.logger.verbose(
-      `Receive ${UserLoggedInEvent.eventName} with user id: ${userId}.`
+      `Receive ${UserLoggedInEvent.eventName} with user id: ${userId}.`,
     );
 
     try {
@@ -44,11 +44,11 @@ export class UserActivityService {
             .update(User)
             .where({ id: userId })
             .set({
-              loggedInCount: () => "loggedInCount + 1",
+              loggedInCount: () => 'loggedInCount + 1',
               lastSessionAt: createdAt,
             })
             .execute();
-        }
+        },
       );
     } catch (e) {
       this.logger.error(e);
@@ -59,7 +59,7 @@ export class UserActivityService {
   async handleUserTokenRefreshedEvent({ payload }: UserTokenRefreshedEvent) {
     const { id: userId, ...meta } = payload;
     this.logger.verbose(
-      `Receive ${UserTokenRefreshedEvent.eventName} with user id: ${userId}.`
+      `Receive ${UserTokenRefreshedEvent.eventName} with user id: ${userId}.`,
     );
 
     try {
@@ -77,7 +77,7 @@ export class UserActivityService {
             id: userId,
             lastSessionAt: createdAt,
           });
-        }
+        },
       );
     } catch (e) {
       this.logger.error(e);

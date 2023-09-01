@@ -1,13 +1,13 @@
-import { HttpStatus } from "@nestjs/common";
-import { ApiResponseSchemaHost } from "@nestjs/swagger";
-import { ApiExceptionDecorator } from "./exception.decorator";
-import { ClassValidatorError } from "../pipe/class-validator.pipe";
+import { HttpStatus } from '@nestjs/common';
+import { ApiResponseSchemaHost } from '@nestjs/swagger';
+import { ApiExceptionDecorator } from './exception.decorator';
+import { ClassValidatorError } from '../pipe/class-validator.pipe';
 
 export enum HttpMessage {
-  BadRequest = "Bad Request",
-  Unauthorized = "Unauthorized",
-  Forbidden = "Forbidden",
-  InternalServerError = "Internal Server Error",
+  BadRequest = 'Bad Request',
+  Unauthorized = 'Unauthorized',
+  Forbidden = 'Forbidden',
+  InternalServerError = 'Internal Server Error',
 }
 
 export interface ApiExceptionParams {
@@ -32,7 +32,7 @@ export function ApiBadRequestException({
         },
         {
           message: [
-            { property: "property1", message: "The property1 is invalid." },
+            { property: 'property1', message: 'The property1 is invalid.' },
           ],
           date: new Date().toISOString(),
         },
@@ -43,7 +43,7 @@ export function ApiBadRequestException({
     HttpStatus.BAD_REQUEST,
     message,
     description,
-    options
+    options,
   );
 }
 
@@ -56,7 +56,7 @@ export function ApiUnauthorizedException({
     HttpStatus.UNAUTHORIZED,
     message,
     description,
-    options
+    options,
   );
 }
 
@@ -69,7 +69,7 @@ export function ApiForbiddenException({
     HttpStatus.FORBIDDEN,
     message,
     description,
-    options
+    options,
   );
 }
 
@@ -82,6 +82,6 @@ export function ApiInternalServerErrorException({
     HttpStatus.INTERNAL_SERVER_ERROR,
     message,
     description,
-    options
+    options,
   );
 }

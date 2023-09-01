@@ -1,8 +1,8 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { Exclude, Expose, Type } from "class-transformer";
-import { MinLength, IsNumber } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import { Exclude, Expose, Type } from 'class-transformer';
+import { MinLength, IsNumber } from 'class-validator';
 
-import { BaseDto } from "../common/dto/base.dto";
+import { BaseDto } from '../common/dto/base.dto';
 
 export class UserDto extends BaseDto<UserDto> {
   @ApiProperty()

@@ -5,8 +5,8 @@ import {
   CreateDateColumn,
   Index,
   ManyToOne,
-} from "typeorm";
-import type { User } from "./user.entity";
+} from 'typeorm';
+import type { User } from './user.entity';
 
 @Entity()
 export class UserActivity {
@@ -17,10 +17,10 @@ export class UserActivity {
   @Index()
   event: string;
 
-  @Column("simple-json", { nullable: true })
+  @Column('simple-json', { nullable: true })
   meta: object;
 
-  @ManyToOne("User", "activities")
+  @ManyToOne('User', 'activities')
   user: User;
 
   @Column()

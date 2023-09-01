@@ -1,6 +1,6 @@
 export enum RoleEnum {
-  User = "User",
-  Admin = "Admin",
+  User = 'User',
+  Admin = 'Admin',
 }
 
 export interface CurrentUser {

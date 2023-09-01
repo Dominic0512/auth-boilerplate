@@ -1,19 +1,19 @@
-import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { EventEmitter2 } from "@nestjs/event-emitter";
-import { ConfigService } from "@nestjs/config";
-import { Between, DataSource, InsertResult, Repository } from "typeorm";
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { ConfigService } from '@nestjs/config';
+import { Between, DataSource, InsertResult, Repository } from 'typeorm';
 
-import { UserRegisterByPasswordEvent } from "../common/event/user.event";
-import { UserProviderEnum, UserStateEnum } from "../common/enum/user.enum";
-import { User } from "./entities/user.entity";
-import { UserProvider } from "./entities/user-provider.entity";
+import { UserRegisterByPasswordEvent } from '../common/event/user.event';
+import { UserProviderEnum, UserStateEnum } from '../common/enum/user.enum';
+import { User } from './entities/user.entity';
+import { UserProvider } from './entities/user-provider.entity';
 import {
   CreateUserWithPasswordDto,
   ProviderDto,
   UpdateUserDto,
   UpsertUserDto,
-} from "./user.dto";
+} from './user.dto';
 
 @Injectable()
 export class UserService {
@@ -23,13 +23,13 @@ export class UserService {
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(UserProvider)
     private userProviderRepository: Repository<UserProvider>,
-    private eventEmitter: EventEmitter2
+    private eventEmitter: EventEmitter2,
   ) {}
 
   dummyPictureFactory(name: string): string {
     return `https://i0.wp.com/cdn.auth0.com/avatars/${name.slice(
       0,
-      2
+      2,
     )}.png?ssl=1`;
   }
 
@@ -58,11 +58,11 @@ export class UserService {
 
   async avgActiveUsersPerDateByTimeframe(
     startedAt: Date,
-    endedAt: Date
+    endedAt: Date,
   ): Promise<number> {
     const { avg } = await this.dateSource
       .createQueryBuilder()
-      .select("ROUND(AVG(uc.count), 1)", "avg")
+      .select('ROUND(AVG(uc.count), 1)', 'avg')
       .from((subQuery) => {
         return subQuery
           .select([
@@ -71,15 +71,15 @@ export class UserService {
             'DATE_PART(\'day\', "lastSessionAt") AS "day"',
             'COUNT(user.name) AS "count"',
           ])
-          .from(User, "user")
+          .from(User, 'user')
           .where('"lastSessionAt" BETWEEN :startedAt AND :endedAt', {
             startedAt,
             endedAt,
           })
-          .addGroupBy("year")
-          .addGroupBy("month")
-          .addGroupBy("day");
-      }, "uc")
+          .addGroupBy('year')
+          .addGroupBy('month')
+          .addGroupBy('day');
+      }, 'uc')
       .getRawOne();
     return Number(avg);
   }
@@ -113,14 +113,14 @@ export class UserService {
 
   upsertNewProvider(
     userId: number,
-    provider: ProviderDto
+    provider: ProviderDto,
   ): Promise<InsertResult> {
     return this.userProviderRepository.upsert(
       {
         userId,
         ...provider,
       },
-      ["userId", "name"]
+      ['userId', 'name'],
     );
   }
 
@@ -146,9 +146,9 @@ export class UserService {
         name,
         email: user.email,
         link: `${this.configService.get(
-          "core.emailVerifyEndpoint"
+          'core.emailVerifyEndpoint',
         )}?token=${verifyToken}`,
-      })
+      }),
     );
 
     return user;
@@ -177,7 +177,7 @@ export class UserService {
     });
   }
 
-  async updateById(id: number, updateUserDto: Omit<UpdateUserDto, "id">) {
+  async updateById(id: number, updateUserDto: Omit<UpdateUserDto, 'id'>) {
     const user = await this.findOneById(id);
 
     return this.userRepository.save({

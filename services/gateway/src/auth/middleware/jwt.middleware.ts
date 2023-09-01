@@ -1,7 +1,7 @@
-import { Injectable, NestMiddleware } from "@nestjs/common";
-import { NextFunction, Request, Response } from "express";
-import { AuthService } from "../auth.service";
-import { CurrentUser } from "../auth.type";
+import { Injectable, NestMiddleware } from '@nestjs/common';
+import { NextFunction, Request, Response } from 'express';
+import { AuthService } from '../auth.service';
+import { CurrentUser } from '../auth.type';
 
 function parseBearerToken(req: Request): string | null {
   const auth = req.headers ? req.headers.authorization || null : null;
@@ -9,7 +9,7 @@ function parseBearerToken(req: Request): string | null {
     return null;
   }
 
-  const parts = auth.split(" ");
+  const parts = auth.split(' ');
 
   if (parts.length < 2) {
     return null;
@@ -17,7 +17,7 @@ function parseBearerToken(req: Request): string | null {
 
   const schema = (parts.shift() as string).toLowerCase();
 
-  if (schema !== "bearer") {
+  if (schema !== 'bearer') {
     return null;
   }
 
@@ -35,7 +35,7 @@ export class JWTMiddleware implements NestMiddleware {
   async use(
     req: RequestWithCurrentUser,
     _response: Response,
-    next: NextFunction
+    next: NextFunction,
   ) {
     const token = parseBearerToken(req);
     req.currentUser = null;

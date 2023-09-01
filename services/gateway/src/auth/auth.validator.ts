@@ -4,11 +4,11 @@ import {
   ValidationArguments,
   registerDecorator,
   ValidationOptions,
-} from "class-validator";
-import { Injectable } from "@nestjs/common";
-import { AuthService } from "./auth.service";
+} from 'class-validator';
+import { Injectable } from '@nestjs/common';
+import { AuthService } from './auth.service';
 
-@ValidatorConstraint({ name: "IsValidAuth0Token" })
+@ValidatorConstraint({ name: 'IsValidAuth0Token' })
 @Injectable()
 export class IsValidAuth0TokenConstraint
   implements ValidatorConstraintInterface
@@ -22,7 +22,7 @@ export class IsValidAuth0TokenConstraint
 
   defaultMessage(args: ValidationArguments) {
     const result = this.authService.verifyAuth0Token(args.value);
-    return result.message || "";
+    return result.message || '';
   }
 }
 
