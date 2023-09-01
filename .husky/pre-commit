@@ -1,4 +1,5 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-pnpm run -r format
+npx nx run-many -t format
+npx nx run-many -t lint

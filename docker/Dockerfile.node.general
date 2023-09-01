@@ -22,7 +22,7 @@ COPY . .
 RUN pnpm run module:install
 
 ENV NODE_ENV=production
-RUN pnpm run -r build
+RUN npx nx run-many -t build
 
 ###############################################
 # Stage 2: Image for running the application
