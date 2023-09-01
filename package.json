@@ -4,7 +4,8 @@
   "scripts": {
     "module:install": "pnpm install",
     "module:clean": "lerna clean && rm -rf ./node_modules",
-    "bump": "lerna version"
+    "bump": "lerna version",
+    "prepare": "husky install"
   },
   "workspaces": [
     "packages/*",
@@ -12,7 +13,10 @@
     "sites/*"
   ],
   "devDependencies": {
+    "@commitlint/cli": "^17.7.1",
+    "@commitlint/config-conventional": "^17.7.0",
     "@nestjs/cli": "^9.0.0",
+    "husky": "^8.0.0",
     "lerna": "^7.1.5",
     "nx": "^16.7.2"
   }
