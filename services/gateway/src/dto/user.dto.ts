@@ -1,19 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Exclude, Expose } from "class-transformer";
-import { IsNumber, MinLength } from "class-validator";
+import { Exclude, Expose, Type } from "class-transformer";
+import { MinLength, IsNumber } from "class-validator";
 
 import { BaseDto } from "../common/dto/base.dto";
-
-export class ManipulateUserDto {
-  @ApiProperty()
-  @IsNumber()
-  id: number;
-}
-export class UpdateMyNameDto {
-  @ApiProperty()
-  @MinLength(1)
-  name: string;
-}
 
 export class UserDto extends BaseDto<UserDto> {
   @ApiProperty()
@@ -59,6 +48,31 @@ export class InternalUserDto extends UserDto {
   @ApiProperty()
   @Expose()
   loggedInCount: number;
+}
+
+export class ManipulateUserDto {
+  @ApiProperty()
+  @Type(() => Number)
+  @IsNumber()
+  id: number;
+}
+
+export class UpdateInternalUserDto {
+  @ApiProperty()
+  @MinLength(1)
+  name: string;
+}
+
+export class PartialUpdateInternalUserDto {
+  @ApiProperty({ nullable: true })
+  @MinLength(1)
+  name?: string;
+}
+
+export class UpdateMyNameDto {
+  @ApiProperty()
+  @MinLength(1)
+  name: string;
 }
 
 export class UserStatisticsDto extends BaseDto<UserStatisticsDto> {

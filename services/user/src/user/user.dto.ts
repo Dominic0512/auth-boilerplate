@@ -8,6 +8,7 @@ import {
   IsUrl,
   MinLength,
 } from "class-validator";
+import { Type } from "class-transformer";
 
 import { UserProviderEnum } from "../common/enum/user.enum";
 
@@ -47,17 +48,15 @@ export class CreateUserWithPasswordDto {
   verifyToken: string;
 }
 
-export class ResetUserPasswordDto {
-  @IsNumber()
-  id: number;
-
-  @IsBase64()
-  newHashPassword: string;
-}
-
 export class ManipulateUserDto {
   @IsNumber()
+  @Type(() => Number)
   id: number;
+}
+
+export class ResetUserPasswordDto extends ManipulateUserDto {
+  @IsBase64()
+  newHashPassword: string;
 }
 
 export class UpdateUserDto extends ManipulateUserDto {

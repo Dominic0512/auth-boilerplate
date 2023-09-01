@@ -1,4 +1,13 @@
-import { Controller, Get, Inject, LiteralObject, Param } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Put,
+  Patch,
+  Inject,
+  LiteralObject,
+  Param,
+  Body,
+} from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 import { ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { firstValueFrom } from "rxjs";
@@ -14,6 +23,8 @@ import {
   InternalUserDto,
   ManipulateUserDto,
   UserStatisticsDto,
+  UpdateInternalUserDto,
+  PartialUpdateInternalUserDto,
 } from "./dto/user.dto";
 
 @ApiTags("user")
@@ -52,12 +63,12 @@ export class UserController {
     );
   }
 
-  @Get("/:id/profile")
+  @Get("/:id")
   @ApiBearAuthWithRoles([RoleEnum.Admin])
   @ApiOkResponse({
     type: InternalUserDto,
     isArray: true,
-    description: "Receive basic user statistics.",
+    description: "Receive basic user information.",
   })
   @ApiUnauthorizedException()
   @ApiForbiddenException()
@@ -65,6 +76,50 @@ export class UserController {
     return new InternalUserDto(
       await firstValueFrom(
         this.userServiceClient.send("USER_GET_BY_ID", { id })
+      )
+    );
+  }
+
+  @Put("/:id")
+  @ApiBearAuthWithRoles([RoleEnum.Admin])
+  @ApiOkResponse({
+    type: InternalUserDto,
+    description: "Whole user information is updated.",
+  })
+  @ApiUnauthorizedException()
+  @ApiForbiddenException()
+  async update(
+    @Param() { id }: ManipulateUserDto,
+    @Body() updateInternalUserDto: UpdateInternalUserDto
+  ) {
+    return new InternalUserDto(
+      await firstValueFrom(
+        this.userServiceClient.send("USER_UPDATE_BY_ID", {
+          id,
+          ...updateInternalUserDto,
+        })
+      )
+    );
+  }
+
+  @Patch("/:id")
+  @ApiBearAuthWithRoles([RoleEnum.Admin])
+  @ApiOkResponse({
+    type: InternalUserDto,
+    description: "Partial user information is updated.",
+  })
+  @ApiUnauthorizedException()
+  @ApiForbiddenException()
+  async partialUpdate(
+    @Param() { id }: ManipulateUserDto,
+    @Body() partialUpdateInternalUserDto: PartialUpdateInternalUserDto
+  ) {
+    return new InternalUserDto(
+      await firstValueFrom(
+        this.userServiceClient.send("USER_UPDATE_BY_ID", {
+          id,
+          ...partialUpdateInternalUserDto,
+        })
       )
     );
   }
