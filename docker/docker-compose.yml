@@ -1,26 +1,26 @@
 # @format
 name: auth-boilerplate
-version: "3.9"
+version: '3.9'
 services:
   database:
     image: cockroachdb/cockroach:v22.2.9
     container_name: database
     ports:
-      - "26257:26257"
-      - "26258:8080"
+      - '26257:26257'
+      - '26258:8080'
     command: start-single-node --insecure
     volumes:
-      - "../database/cockroach-data:/cockroach/cockroach-data"
+      - '../database/cockroach-data:/cockroach/cockroach-data'
   gateway:
     image: node-dev:local
     container_name: gateway
     build:
       context: .
-      dockerfile: "./Dockerfile.node.dev"
+      dockerfile: './Dockerfile.node.dev'
     environment:
       - SERVICE=gateway
     ports:
-      - "10001:8000"
+      - '10001:8000'
     volumes:
       - ../:/var/app/auth-boilerplate
   user:
@@ -28,8 +28,20 @@ services:
     container_name: user
     build:
       context: .
-      dockerfile: "./Dockerfile.node.dev"
+      dockerfile: './Dockerfile.node.dev'
     environment:
       - SERVICE=user
+    volumes:
+      - ../:/var/app/auth-boilerplate
+  web-client:
+    image: node-dev:local
+    container_name: web-client
+    build:
+      context: .
+      dockerfile: './Dockerfile.node.dev'
+    environment:
+      - SERVICE=web-client
+    ports:
+      - '11001:3000'
     volumes:
       - ../:/var/app/auth-boilerplate
