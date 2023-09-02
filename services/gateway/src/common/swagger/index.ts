@@ -1,7 +1,6 @@
-import { HttpStatus } from '@nestjs/common';
+import { HttpStatus, LiteralObject } from '@nestjs/common';
 import { ApiResponseSchemaHost } from '@nestjs/swagger';
 import { ApiExceptionDecorator } from './exception.decorator';
-import { ClassValidatorError } from '../pipe/class-validator.pipe';
 
 export enum HttpMessage {
   BadRequest = 'Bad Request',
@@ -11,7 +10,7 @@ export enum HttpMessage {
 }
 
 export interface ApiExceptionParams {
-  message?: string | ClassValidatorError[];
+  message?: string | LiteralObject[];
   description?: string;
   options?: ApiResponseSchemaHost;
 }
@@ -39,7 +38,7 @@ export function ApiBadRequestException({
       ],
     },
   };
-  return ApiExceptionDecorator<ClassValidatorError>(
+  return ApiExceptionDecorator(
     HttpStatus.BAD_REQUEST,
     message,
     description,

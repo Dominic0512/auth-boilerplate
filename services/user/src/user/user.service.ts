@@ -2,7 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ConfigService } from '@nestjs/config';
-import { Between, DataSource, InsertResult, Repository } from 'typeorm';
+import {
+  Between,
+  DataSource,
+  FindOptionsRelations,
+  FindOptionsWhere,
+  InsertResult,
+  Repository,
+} from 'typeorm';
 
 import { UserRegisterByPasswordEvent } from '../common/event/user.event';
 import { UserProviderEnum, UserStateEnum } from '../common/enum/user.enum';
@@ -40,8 +47,11 @@ export class UserService {
     return UserProviderEnum[capitalizeName];
   }
 
-  find(): Promise<User[]> {
-    return this.userRepository.find();
+  find(
+    where: FindOptionsWhere<User>,
+    relations: FindOptionsRelations<User>,
+  ): Promise<User[]> {
+    return this.userRepository.find({ where, relations });
   }
 
   count(): Promise<number> {
@@ -160,6 +170,10 @@ export class UserService {
 
   findOneByEmail(email: string): Promise<User> {
     return this.userRepository.findOneBy({ email });
+  }
+
+  findProvidersByUserId(id: number): Promise<UserProvider[]> {
+    return this.userProviderRepository.findBy({ userId: id });
   }
 
   async verifyByEmail(email: string): Promise<User> {

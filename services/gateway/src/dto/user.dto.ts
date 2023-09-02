@@ -1,9 +1,33 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Exclude, Expose, Type } from 'class-transformer';
-import { MinLength, IsNumber } from 'class-validator';
+import { Exclude, Expose, Type, Transform } from 'class-transformer';
+import { MinLength, IsNumber, IsBoolean } from 'class-validator';
 
 import { BaseDto } from '../common/dto/base.dto';
 
+export enum UserProviderEnum {
+  Facebook = 'Facebook',
+  Google = 'Google',
+  Primary = 'Primary',
+}
+
+export class ListUserQueryDto {
+  @ApiProperty({ default: false })
+  @IsBoolean()
+  @Transform(({ value }) => value === 'true')
+  includeProvider: boolean;
+}
+export class UserProviderDto extends BaseDto<UserDto> {
+  @ApiProperty({
+    enum: UserProviderEnum,
+    example: UserProviderEnum.Primary,
+  })
+  @Expose()
+  name: UserProviderEnum;
+
+  @ApiProperty()
+  @Expose()
+  picture: string;
+}
 export class UserDto extends BaseDto<UserDto> {
   @ApiProperty()
   @Expose()
@@ -24,6 +48,11 @@ export class UserDto extends BaseDto<UserDto> {
   @ApiProperty()
   @Expose()
   email: string;
+
+  @ApiProperty()
+  @Expose()
+  @Type(() => UserProviderDto)
+  providers?: UserProviderDto[];
 
   @Exclude({ toPlainOnly: true })
   password?: string;

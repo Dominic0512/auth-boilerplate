@@ -1,9 +1,9 @@
+import { LiteralObject } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
-import { ClassValidatorError } from '../pipe/class-validator.pipe';
 
 export class ExceptionDto {
   @ApiProperty()
-  message: string | ClassValidatorError[];
+  message: string | LiteralObject[];
 
   @ApiProperty({ default: new Date().toISOString() })
   date: Date;

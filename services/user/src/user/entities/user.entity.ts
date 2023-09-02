@@ -9,7 +9,7 @@ import {
 import { Exclude } from 'class-transformer';
 
 import { UserStateEnum, UserRoleEnum } from '../../common/enum/user.enum';
-import type { UserProvider } from './user-provider.entity';
+import { UserProvider } from './user-provider.entity';
 import type { UserActivity } from './user-activity.entity';
 
 @Entity()

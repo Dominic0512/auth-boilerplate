@@ -17,6 +17,7 @@ import {
 } from '../common/event/user.event';
 import { UserService } from './user.service';
 import { User } from './entities/user.entity';
+import { UserProvider } from './entities/user-provider.entity';
 
 @Controller('user')
 export class UserController {
@@ -26,8 +27,8 @@ export class UserController {
   ) {}
 
   @MessagePattern('USER_LIST')
-  list() {
-    return this.userService.find();
+  list(@Payload() { includeProvider = false }) {
+    return this.userService.find({}, { providers: includeProvider });
   }
 
   @MessagePattern('USER_GET_BY_ID')
@@ -38,6 +39,11 @@ export class UserController {
   @MessagePattern('USER_GET_BY_EMAIL')
   getByEmail(@Payload() { email }): Promise<User> {
     return this.userService.findOneByEmail(email);
+  }
+
+  @MessagePattern('USER_GET_PROVIDERS_BY_ID')
+  getProvidersByUserId(@Payload() { id }): Promise<UserProvider[]> {
+    return this.userService.findProvidersByUserId(id);
   }
 
   @MessagePattern('USER_STATISTICS')

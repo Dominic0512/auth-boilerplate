@@ -1,4 +1,4 @@
-import { applyDecorators, HttpStatus } from '@nestjs/common';
+import { applyDecorators, HttpStatus, LiteralObject } from '@nestjs/common';
 import {
   ApiResponse,
   ApiResponseSchemaHost,
@@ -6,7 +6,7 @@ import {
 } from '@nestjs/swagger';
 import { ExceptionDto } from './exception.dto';
 
-export function ApiExceptionDecorator<T>(
+export function ApiExceptionDecorator<T = LiteralObject>(
   statusCode: HttpStatus,
   message: string | T[],
   description?: string,

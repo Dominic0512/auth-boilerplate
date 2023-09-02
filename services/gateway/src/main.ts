@@ -1,12 +1,13 @@
 import { NestFactory, Reflector } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { useContainer } from 'class-validator';
+import { ValidationError, useContainer } from 'class-validator';
 import * as cookieParser from 'cookie-parser';
 
+import { ValidationException } from './common/exception';
 import { HttpExceptionFilter } from './common/filter/http-exception.filter';
-import { ClassValidatorPipe } from './common/pipe/class-validator.pipe';
+import { ValidationExceptionFilter } from './common/filter/validation-exception.filter';
 import { AppModule } from './app.module';
-import { ClassSerializerInterceptor } from '@nestjs/common';
+import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -34,8 +35,19 @@ async function bootstrap() {
 
   app.enableCors();
   app.use(cookieParser());
-  app.useGlobalFilters(new HttpExceptionFilter());
-  app.useGlobalPipes(new ClassValidatorPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+      transformOptions: { enableImplicitConversion: false },
+      exceptionFactory: (errors: ValidationError[]) =>
+        new ValidationException(errors),
+    }),
+  );
+  app.useGlobalFilters(
+    new HttpExceptionFilter(),
+    new ValidationExceptionFilter(),
+  );
   app.useGlobalInterceptors(
     new ClassSerializerInterceptor(app.get(Reflector), {
       strategy: 'excludeAll',
