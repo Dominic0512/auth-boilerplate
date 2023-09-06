@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import './global.css';
 
@@ -16,7 +17,9 @@ export default function RootLayout({
           <header className="flex justify-center">
             <Navbar />
           </header>
-          <main className="pt-16">{children}</main>
+          <main className="relative min-h-screen pt-20">
+            <div className="relative max-w-12xl mx-auto px-8">{children}</div>
+          </main>
           <footer></footer>
         </Providers>
       </body>

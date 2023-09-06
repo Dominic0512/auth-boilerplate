@@ -1,10 +1,16 @@
+'use client';
 import Link from 'next/link';
 import NavLink from './NavLink';
 import DarkModeToggle from './DarkModeToggle';
+import { useAuthStore } from '../store/auth';
+import { useMe } from '../hook/auth';
 
 const links = [{ name: 'Dashboard', href: '/dashboard' }];
 
 export default function Navbar() {
+  const { accessToken } = useAuthStore();
+  const { data } = useMe();
+
   return (
     <nav className="w-screen max-w-12xl fixed flex flex-row px-8 py-4 items-center justify-between bg-white dark:bg-gray-900 z-50">
       <Link className="text-2xl font-bold" href="/">
@@ -22,6 +28,7 @@ export default function Navbar() {
       <div>
         <DarkModeToggle></DarkModeToggle>
       </div>
+      <div>{accessToken && data?.email}</div>
     </nav>
   );
 }
