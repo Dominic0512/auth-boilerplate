@@ -15,8 +15,8 @@ services:
     image: node-dev:local
     container_name: gateway
     build:
-      context: .
-      dockerfile: './Dockerfile.node.dev'
+      context: ../
+      dockerfile: './docker/Dockerfile.node.dev'
     environment:
       - SERVICE=gateway
     ports:
@@ -27,18 +27,18 @@ services:
     image: node-dev:local
     container_name: user
     build:
-      context: .
-      dockerfile: './Dockerfile.node.dev'
+      context: ../
+      dockerfile: './docker/Dockerfile.node.dev'
     environment:
       - SERVICE=user
     volumes:
-      - ../:/var/app/auth-boilerplate
+      - ../:/var/app/auth-boilerplat
   web-client:
     image: node-dev:local
     container_name: web-client
     build:
-      context: .
-      dockerfile: './Dockerfile.node.dev'
+      context: ../
+      dockerfile: './docker/Dockerfile.node.dev'
     environment:
       - SERVICE=web-client
     ports:

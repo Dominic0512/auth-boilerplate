@@ -1,5 +1,6 @@
 database
 node_modules
 docker
+.pnpm-store
 
 .env.makefile

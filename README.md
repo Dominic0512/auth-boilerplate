@@ -20,6 +20,18 @@ cp ./services/user/.env.example ./services/users/.env.development
 docker-compose -f ./docker/docker-compose.yml up -d
 ```
 
+## 3. Install dependencies
+```
+pnpm run module:install
+pnpm run module:install --force # Alternative for Mac M1, M2 ...etc
+```
+
+## 4. Restart services
+```
+docker-compose -f ./docker/docker-compose.yml restart
+```
+
+
 # Getting Starteed for Deployment
 
 ## 1. To clone the env.example files for deployment, follow the following paths:
