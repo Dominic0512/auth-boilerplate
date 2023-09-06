@@ -7,8 +7,8 @@ import axios, {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from 'axios';
-import { AuthApiFactory, UserApiFactory, Configuration } from './generated';
-import { useAuthStore } from './store/auth';
+import { AuthApiFactory, UserApiFactory, Configuration } from '../generated';
+import { useAuthStore } from '../store/auth';
 
 const logOnDev = (message: string) => {
   if (process.env.NODE_ENV === 'development') {

@@ -1,47 +1,44 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import zod from 'zod';
 
-import { useLogin } from '../hook/auth';
+import { useRegister } from '../../../hooks/auth';
+import { passwordRule } from '../shared';
 
 interface FormData {
   email: string;
   password: string;
+  confirmPassword: string;
 }
 
-const formSchema = zod.object({
-  email: zod.string().email(),
-  password: zod
-    .string()
-    .min(8)
-    .regex(new RegExp('.*[A-Z].*'), 'At least one uppercase character')
-    .regex(new RegExp('.*[a-z].*'), 'At least one lowercase character')
-    .regex(
-      new RegExp('.*[`~<>?,./!@#$%^&*()\\-_+="\'|{}\\[\\];:\\\\].*'),
-      'At least one special character',
-    )
-    .regex(new RegExp('.*\\d.*'), 'One number'),
-});
+const formSchema = zod
+  .object({
+    email: zod.string().email(),
+    password: passwordRule,
+    confirmPassword: passwordRule,
+  })
+  .refine(({ password, confirmPassword }) => password === confirmPassword, {
+    message: 'The password is inconsistent.',
+    path: ['confirmPassword'],
+  });
 
-export default function Login() {
-  const router = useRouter();
-  const loginMutation = useLogin();
+export default function Register() {
+  const registerMutation = useRegister();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>({
+    mode: 'onBlur',
     resolver: zodResolver(formSchema),
   });
 
   const onSubmit = handleSubmit(
-    (data) => {
-      loginMutation.mutate(data);
-      router.replace('/dashboard');
+    ({ confirmPassword, ...remainingData }: FormData) => {
+      registerMutation.mutate(remainingData);
     },
     (error) => console.error(error),
   );
@@ -67,6 +64,15 @@ export default function Login() {
               {...register('password')}
             ></input>
             <p className="text-red-500">{errors.password?.message}</p>
+          </div>
+          <div className="flex flex-col justify-center gap-2">
+            <label className="grow">Confirm Password</label>
+            <input
+              className="w-full h-10"
+              type="password"
+              {...register('confirmPassword')}
+            ></input>
+            <p className="text-red-500">{errors.confirmPassword?.message}</p>
           </div>
           <button
             className="border border-white py-2"

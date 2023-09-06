@@ -8,7 +8,7 @@
     "start:prod": "next start",
     "lint": "next lint",
     "format": "prettier --write \"app/**/*.tsx\"",
-    "generate:open-api": "openapi-generator generate -i http://localhost:10001/api/swagger-json -g typescript-axios -o ./app/generated"
+    "generate:open-api": "openapi-generator generate -i http://localhost:10001/api/swagger-json -g typescript-axios -o ./generated"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.1",
