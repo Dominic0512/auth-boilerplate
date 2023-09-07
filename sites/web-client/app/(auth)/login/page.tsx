@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import zod from 'zod';
@@ -33,10 +33,15 @@ export default function Login() {
   const onSubmit = handleSubmit(
     (data) => {
       loginMutation.mutate(data);
-      router.replace('/dashboard');
     },
     (error) => console.error(error),
   );
+
+  useEffect(() => {
+    if (loginMutation.isSuccess) {
+      router.replace('/dashboard');
+    }
+  }, [loginMutation, router]);
 
   return (
     <div className="mt-36">

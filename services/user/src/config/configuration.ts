@@ -4,7 +4,7 @@ export const configuration = () => {
       nodeEnv: process.env.NODE_ENV,
       host: process.env.USER_HOST,
       port: Number(process.env.USER_PORT),
-      emailVerifyEndpoint: process.env.EMAIL_VERIFY_ENDPOINT,
+      emailVerifyEndpoint: process.env.CORE_EMAIL_VERIFY_ENDPOINT,
       emailDomain: process.env.CORE_EMAIL_DOMAIN,
     },
     database: {

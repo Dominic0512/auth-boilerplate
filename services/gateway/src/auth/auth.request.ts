@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsStrongPassword } from 'class-validator';
+import { IsEmail, IsString, IsStrongPassword } from 'class-validator';
 import { IsValidAuth0Token } from './auth.validator';
 
 export class AuthByAuth0Request {
@@ -37,6 +37,7 @@ export class RegisterRequest {
 
 export class VerifyRequest {
   @ApiProperty()
+  @IsString()
   token: string;
 }
 
@@ -44,6 +45,7 @@ export class LoginRequest extends RegisterRequest {}
 
 export class AuthByIdTokenRequest extends AuthByAuth0Request {
   @ApiProperty()
+  @IsString()
   idToken: string;
 }
 

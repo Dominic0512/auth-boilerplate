@@ -6,6 +6,7 @@ import {
   UserDto,
   LoginRequest,
   RegisterRequest,
+  VerifyRequest,
 } from '../generated';
 
 function useRegister() {
@@ -15,6 +16,18 @@ function useRegister() {
       return data;
     },
     onSuccess: () => {},
+  });
+}
+
+function useVerify() {
+  return useMutation<TokenResponse, Error, VerifyRequest>({
+    mutationFn: async (variables) => {
+      const { data } = await AuthApiInstance.authControllerVerify(variables);
+      return data;
+    },
+    onSuccess: ({ accessToken }) => {
+      useAuthStore.getState().setAccessToken(accessToken);
+    },
   });
 }
 
@@ -40,4 +53,4 @@ function useMe() {
   });
 }
 
-export { useRegister, useLogin, useMe };
+export { useRegister, useVerify, useLogin, useMe };
