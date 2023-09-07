@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import zod from 'zod';
 
-import { useLogin } from '../../../hooks/auth';
+import { useLogin } from '@/hooks/react-query/auth';
 import { passwordRule } from '../shared';
 
 interface FormData {

@@ -1,9 +1,9 @@
 'use client';
 import { PropsWithChildren } from 'react';
 import { ThemeProvider } from 'next-themes';
-import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 
-const queryClient = new QueryClient();
+import { queryClient } from '@/hooks/react-query';
 
 export function Providers({ children }: PropsWithChildren<unknown>) {
   return (

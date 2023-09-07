@@ -50,10 +50,10 @@ export default function DarkModeToggle() {
 
   return (
     <button
-      className="w-12 h-12 overflow-hidden rounded-full border-black hover:border-gray-300 dark:border-white dark:hover:border-gray-500 inline-flex items-center justify-center border-2 transition focus:outline-none'"
+      className="relative w-12 h-12 overflow-hidden rounded-full border-black hover:border-gray-300 dark:border-white dark:hover:border-gray-500 inline-flex items-center justify-center border-2 transition focus:outline-none"
       onClick={darkModeToggle}
     >
-      <div className="relative w-8 h-8">
+      <div className="relative w-full h-full">
         <motion.span
           className="absolute inset-0"
           style={{ transformOrigin: '50% 96px' }}

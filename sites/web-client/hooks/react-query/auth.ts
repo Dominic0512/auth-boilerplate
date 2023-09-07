@@ -1,13 +1,14 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { AuthApiInstance } from '../services/api-client';
-import { useAuthStore } from '../store/auth';
+import { AuthApiInstance } from '@/services/api-client';
+import { useAuthStore } from '@/store/auth';
 import {
   TokenResponse,
   UserDto,
   LoginRequest,
   RegisterRequest,
   VerifyRequest,
-} from '../generated';
+} from '@/generated';
+import { queryClient } from './index';
 
 function useRegister() {
   return useMutation<UserDto, Error, RegisterRequest>({
@@ -39,6 +40,7 @@ function useLogin() {
     },
     onSuccess: ({ accessToken }) => {
       useAuthStore.getState().setAccessToken(accessToken);
+      queryClient.invalidateQueries({ queryKey: ['me'] });
     },
   });
 }
@@ -53,4 +55,14 @@ function useMe() {
   });
 }
 
-export { useRegister, useVerify, useLogin, useMe };
+function useLogout() {
+  return useMutation<unknown, Error, unknown>({
+    mutationFn: AuthApiInstance.authControllerLogout,
+    onSuccess: () => {
+      useAuthStore.getState().setAccessToken('');
+      queryClient.invalidateQueries({ queryKey: ['me'] });
+    },
+  });
+}
+
+export { useRegister, useVerify, useLogin, useMe, useLogout };

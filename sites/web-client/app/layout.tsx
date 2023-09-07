@@ -1,11 +1,12 @@
 'use client';
-import React, { PropsWithChildren } from 'react';
 import './global.css';
+import React, { PropsWithChildren, useEffect } from 'react';
 import Link, { LinkProps } from 'next/link';
+import { useRouter } from 'next/navigation';
 
-import { useMe } from '../hooks/auth';
-import DarkModeToggle from '../components/DarkModeToggle';
-import { useAuthStore } from '../store/auth';
+import { useLogout, useMe } from '@/hooks/react-query/auth';
+import DarkModeToggle from '@/components/DarkModeToggle';
+import Avatar from '@/components/Avatar';
 
 import { Providers } from './providers';
 
@@ -20,8 +21,19 @@ function NavLink({ children, ...rest }: PropsWithChildren<LinkProps>) {
 }
 
 function Navbar() {
-  const { accessToken } = useAuthStore();
-  const { data } = useMe();
+  const router = useRouter();
+  const { data, isFetched, isError } = useMe();
+  const logoutMutation = useLogout();
+
+  const handleLogout = () => {
+    logoutMutation.mutate({});
+  };
+
+  useEffect(() => {
+    if (logoutMutation.isSuccess) {
+      router.replace('/');
+    }
+  }, [logoutMutation, router]);
 
   return (
     <nav className="w-screen max-w-12xl fixed flex flex-row px-8 py-4 items-center justify-between bg-white dark:bg-gray-900 z-50">
@@ -37,10 +49,30 @@ function Navbar() {
           ))}
         </ul>
       </div>
-      <div>
-        <DarkModeToggle></DarkModeToggle>
+      <div className="flex items-center gap-4">
+        <div>
+          <DarkModeToggle />
+        </div>
+        {!isError && isFetched ? (
+          <div className="dropdown dropdown-end">
+            <Avatar name={data?.name} />
+            <ul className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+              <li>
+                <Link href="/profile">Profile</Link>
+              </li>
+              <li>
+                <button type="button" onClick={handleLogout}>
+                  Logout
+                </button>
+              </li>
+            </ul>
+          </div>
+        ) : (
+          <button type="button" onClick={() => router.push('/login')}>
+            Login/Register
+          </button>
+        )}
       </div>
-      <div>{accessToken && data?.email}</div>
     </nav>
   );
 }

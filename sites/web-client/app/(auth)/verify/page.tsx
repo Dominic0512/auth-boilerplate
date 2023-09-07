@@ -1,7 +1,7 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { useVerify } from '../../../hooks/auth';
+import { useVerify } from '@/hooks/react-query/auth';
 
 export default function Verify({
   searchParams,
