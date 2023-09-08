@@ -50,7 +50,7 @@ export default function Register() {
           <div className="flex flex-col justify-center gap-2">
             <label className="grow">Email</label>
             <input
-              className="w-full h-10"
+              className="input input-bordered w-full"
               type="email"
               {...register('email')}
             ></input>
@@ -59,7 +59,7 @@ export default function Register() {
           <div className="flex flex-col justify-center gap-2">
             <label className="grow">Password</label>
             <input
-              className="w-full h-10"
+              className="input input-bordered w-full"
               type="password"
               {...register('password')}
             ></input>
@@ -68,17 +68,13 @@ export default function Register() {
           <div className="flex flex-col justify-center gap-2">
             <label className="grow">Confirm Password</label>
             <input
-              className="w-full h-10"
+              className="input input-bordered w-full"
               type="password"
               {...register('confirmPassword')}
             ></input>
             <p className="text-red-500">{errors.confirmPassword?.message}</p>
           </div>
-          <button
-            className="border border-white py-2"
-            type="button"
-            onClick={onSubmit}
-          >
+          <button className="btn" type="button" onClick={onSubmit}>
             Submit
           </button>
         </div>

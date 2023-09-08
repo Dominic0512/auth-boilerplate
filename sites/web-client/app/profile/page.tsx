@@ -21,6 +21,7 @@ export default function ProfilePage() {
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>({
+    mode: 'onBlur',
     values: me.data,
     resolver: zodResolver(formSchema),
   });
@@ -39,7 +40,7 @@ export default function ProfilePage() {
           <div className="flex flex-col justify-center gap-2">
             <label className="grow">Email</label>
             <input
-              className="w-full h-10"
+              className="input input-bordered w-full"
               type="email"
               disabled
               value={me?.data?.email}
@@ -48,17 +49,13 @@ export default function ProfilePage() {
           <div className="flex flex-col justify-center gap-2">
             <label className="grow">Name</label>
             <input
-              className="w-full h-10"
+              className="input input-bordered w-full"
               type="email"
               {...register('name')}
             ></input>
             <p className="text-red-500">{errors.name?.message}</p>
           </div>
-          <button
-            className="border border-white py-2"
-            type="button"
-            onClick={onSubmit}
-          >
+          <button className="btn" type="button" onClick={onSubmit}>
             Submit
           </button>
         </div>

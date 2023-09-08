@@ -7,7 +7,7 @@ import { queryClient } from '@/hooks/react-query';
 
 export function Providers({ children }: PropsWithChildren<unknown>) {
   return (
-    <ThemeProvider attribute="class">
+    <ThemeProvider attribute="data-theme">
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     </ThemeProvider>
   );

@@ -12,7 +12,7 @@ export default function Avatar({ imageUrl, name, onClick }: AvatarProps) {
   const src = imageUrl ? imageUrl : dummyImageUrl;
   return (
     <button
-      className="relative w-12 h-12 overflow-hidden rounded-full border-black hover:border-gray-300 dark:border-white dark:hover:border-gray-500 inline-flex items-center justify-center border-2 transition focus:outline-none"
+      className="relative w-12 h-12 btn btn-circle btn-outline border-2 overflow-hidden"
       onClick={onClick}
     >
       <Image width={100} height={100} src={src} alt="avatar" />

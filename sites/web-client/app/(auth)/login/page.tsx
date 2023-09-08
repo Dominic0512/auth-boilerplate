@@ -27,6 +27,7 @@ export default function Login() {
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>({
+    mode: 'onBlur',
     resolver: zodResolver(formSchema),
   });
 
@@ -50,7 +51,7 @@ export default function Login() {
           <div className="flex flex-col justify-center gap-2">
             <label className="grow">Email</label>
             <input
-              className="w-full h-10"
+              className="input input-bordered w-full"
               type="email"
               {...register('email')}
             ></input>
@@ -59,17 +60,13 @@ export default function Login() {
           <div className="flex flex-col justify-center gap-2">
             <label className="grow">Password</label>
             <input
-              className="w-full h-10"
+              className="input input-bordered w-full"
               type="password"
               {...register('password')}
             ></input>
             <p className="text-red-500">{errors.password?.message}</p>
           </div>
-          <button
-            className="border border-white py-2"
-            type="button"
-            onClick={onSubmit}
-          >
+          <button className="btn" type="button" onClick={onSubmit}>
             Submit
           </button>
         </div>

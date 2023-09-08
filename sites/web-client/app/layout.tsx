@@ -36,7 +36,7 @@ function Navbar() {
   }, [logoutMutation, router]);
 
   return (
-    <nav className="w-screen max-w-12xl fixed flex flex-row px-8 py-4 items-center justify-between bg-white dark:bg-gray-900 z-50">
+    <nav className="w-screen max-w-12xl fixed flex flex-row px-8 py-4 items-center justify-between bg-base-100 z-50">
       <Link className="text-2xl font-bold" href="/">
         <h1>Auth Boilerplate Demo</h1>
       </Link>
@@ -68,8 +68,12 @@ function Navbar() {
             </ul>
           </div>
         ) : (
-          <button type="button" onClick={() => router.push('/login')}>
-            Login/Register
+          <button
+            type="button"
+            className="btn"
+            onClick={() => router.push('/login')}
+          >
+            Login / Register
           </button>
         )}
       </div>
@@ -84,7 +88,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="bg-white dark:bg-gray-900">
+      <body className="bg-base-100">
         <Providers>
           <header className="flex justify-center">
             <Navbar />
