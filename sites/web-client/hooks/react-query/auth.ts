@@ -7,6 +7,7 @@ import {
   LoginRequest,
   RegisterRequest,
   VerifyRequest,
+  UpdateMyNameDto,
 } from '@/generated';
 import { queryClient } from './index';
 
@@ -55,6 +56,15 @@ function useMe() {
   });
 }
 
+function useUpdateMyname() {
+  return useMutation<UserDto, Error, UpdateMyNameDto>({
+    mutationFn: AuthApiInstance.authControllerUpdateMyName,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['me'] });
+    },
+  });
+}
+
 function useLogout() {
   return useMutation<unknown, Error, unknown>({
     mutationFn: AuthApiInstance.authControllerLogout,
@@ -65,4 +75,4 @@ function useLogout() {
   });
 }
 
-export { useRegister, useVerify, useLogin, useMe, useLogout };
+export { useRegister, useVerify, useLogin, useMe, useUpdateMyname, useLogout };
