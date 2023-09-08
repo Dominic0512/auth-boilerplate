@@ -10,3 +10,11 @@ export const passwordRule = zod
     'At least one special character',
   )
   .regex(new RegExp('.*\\d.*'), 'One number');
+
+export interface OAuthRedirectUrlParams {
+  authorizeUrl: string;
+  clientId: string;
+  connection: string;
+  callbackUrl: string;
+  state: string;
+}

@@ -8,6 +8,7 @@ import {
   RegisterRequest,
   VerifyRequest,
   UpdateMyNameDto,
+  AuthByIdTokenRequest,
 } from '@/generated';
 import { queryClient } from './index';
 
@@ -46,6 +47,21 @@ function useLogin() {
   });
 }
 
+function useAuthByIdToken() {
+  return useMutation<TokenResponse, Error, AuthByIdTokenRequest>({
+    mutationFn: async (variables) => {
+      const { data } = await AuthApiInstance.authControllerAuthByIdToken(
+        variables,
+      );
+      return data;
+    },
+    onSuccess: ({ accessToken }) => {
+      useAuthStore.getState().setAccessToken(accessToken);
+      queryClient.invalidateQueries({ queryKey: ['me'] });
+    },
+  });
+}
+
 function useMe() {
   return useQuery<UserDto, Error, UserDto>({
     queryKey: ['me'],
@@ -75,4 +91,12 @@ function useLogout() {
   });
 }
 
-export { useRegister, useVerify, useLogin, useMe, useUpdateMyname, useLogout };
+export {
+  useRegister,
+  useVerify,
+  useLogin,
+  useAuthByIdToken,
+  useMe,
+  useUpdateMyname,
+  useLogout,
+};

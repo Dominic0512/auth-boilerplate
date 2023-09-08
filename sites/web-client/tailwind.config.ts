@@ -8,6 +8,10 @@ module.exports = {
   ],
   theme: {
     extend: {
+      colors: {
+        facebook: '#1877F2',
+        google: '#DB4437',
+      },
       maxWidth: {
         '8xl': '88rem',
         '10xl': '104rem',
@@ -19,5 +23,5 @@ module.exports = {
   daisyui: {
     themes: ['light', 'dark'],
   },
-  darkMode: 'data-theme',
+  darkMode: ['class', '[data-theme="dark"]'],
 };

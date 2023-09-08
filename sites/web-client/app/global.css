@@ -1,3 +1,16 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.box {
+  @apply rounded-xl bg-gray-200 dark:bg-neutral
+}
+
+.btn-facebook {
+  @apply bg-facebook text-white hover:text-facebook hover:bg-white
+}
+
+.btn-google {
+  @apply bg-google text-white hover:text-google hover:bg-white
+}
+
