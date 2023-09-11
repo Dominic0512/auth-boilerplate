@@ -37,8 +37,9 @@ function apiInstanceParamsFactory(params: ApiInstanceParams) {
     axiosInstance: undefined,
     ...params,
   };
-  return (apiFactory: any) =>
-    apiFactory(configuration, basePath, axiosInstance);
+  return <T extends (...args: any[]) => any>(apiFactory: T): ReturnType<T> => {
+    return apiFactory(configuration, basePath, axiosInstance);
+  };
 }
 
 const onRequest = (

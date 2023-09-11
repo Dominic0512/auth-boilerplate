@@ -74,7 +74,12 @@ function useMe() {
 
 function useUpdateMyname() {
   return useMutation<UserDto, Error, UpdateMyNameDto>({
-    mutationFn: AuthApiInstance.authControllerUpdateMyName,
+    mutationFn: async (variables) => {
+      const { data } = await AuthApiInstance.authControllerUpdateMyName(
+        variables,
+      );
+      return data;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['me'] });
     },
