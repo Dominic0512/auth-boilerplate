@@ -89,6 +89,22 @@ export class AuthService {
     ).getPublicKey();
   }
 
+  isTokenExpired(token: string, secret: string) {
+    try {
+      jwt.verify(token, secret);
+      return false;
+    } catch (e) {
+      if (e instanceof jwt.TokenExpiredError) {
+        return true;
+      }
+      return false;
+    }
+  }
+
+  isPrimaryTokenExpired(token: string) {
+    return this.isTokenExpired(token, this.accessTokenSecret);
+  }
+
   verifyToken(token: string, secret: string) {
     try {
       jwt.verify(token, secret);

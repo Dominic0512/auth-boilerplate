@@ -26,6 +26,7 @@ function parseBearerToken(req: Request): string | null {
 
 export interface RequestWithCurrentUser extends Request {
   currentUser: CurrentUser;
+  isTokenExpired: boolean;
 }
 
 @Injectable()
@@ -43,6 +44,10 @@ export class JWTMiddleware implements NestMiddleware {
     if (token && this.authService.verifyPrimaryAccessToken(token).success) {
       const currentUser: CurrentUser = this.authService.decodeToken(token);
       req.currentUser = currentUser;
+    }
+
+    if (token) {
+      req.isTokenExpired = this.authService.isPrimaryTokenExpired(token);
     }
 
     next();

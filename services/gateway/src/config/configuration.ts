@@ -10,6 +10,9 @@ export const configuration = () => {
         host: process.env.USER_HOST,
         port: Number(process.env.USER_PORT),
       },
+      allowedClientHosts: (process.env.CORE_ALLOWED_CLIENT_HOSTS ?? '*').split(
+        ',',
+      ),
       accessTokenSecret: process.env.CORE_ACCESS_TOKEN_SECRET,
       accessTokenAging: eval(process.env.CORE_ACCESS_TOKEN_AGING),
       refreshTokenSecret: process.env.CORE_REFRESH_TOKEN_SECRET,

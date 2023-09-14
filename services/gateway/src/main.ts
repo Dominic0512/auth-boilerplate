@@ -1,13 +1,14 @@
 import { NestFactory, Reflector } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { ValidationError, useContainer } from 'class-validator';
 import * as cookieParser from 'cookie-parser';
 
 import { ValidationException } from './common/exception';
 import { HttpExceptionFilter } from './common/filter/http-exception.filter';
 import { ValidationExceptionFilter } from './common/filter/validation-exception.filter';
+import { configuration } from './config/configuration';
 import { AppModule } from './app.module';
-import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -33,7 +34,11 @@ async function bootstrap() {
 
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
-  app.enableCors();
+  app.enableCors({
+    origin: configuration().core.allowedClientHosts,
+    credentials: true,
+    exposedHeaders: ['set-cookie'],
+  });
   app.use(cookieParser());
   app.useGlobalPipes(
     new ValidationPipe({

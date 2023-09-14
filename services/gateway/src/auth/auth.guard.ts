@@ -22,6 +22,11 @@ export class RolesGuard implements CanActivate {
     }
 
     const request = context.switchToHttp().getRequest();
+
+    if (request.isTokenExpired) {
+      throw new UnauthorizedException('Token expired');
+    }
+
     const currentUser: CurrentUser = request.currentUser;
 
     if (!currentUser) {

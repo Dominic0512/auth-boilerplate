@@ -18,6 +18,7 @@ const logOnDev = (message: string) => {
 
 const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_HOST,
+  withCredentials: true,
 });
 
 type ApiInstanceParams = {
@@ -26,8 +27,14 @@ type ApiInstanceParams = {
   axiosInstance?: AxiosInstance;
 };
 
+type AxiosRequestRetryConfig = AxiosRequestConfig & { _retry: boolean };
+
 function getCurrentAccessToken() {
   return useAuthStore.getState().accessToken;
+}
+
+function setAccessToken(accessToken: string) {
+  return useAuthStore.getState().setAccessToken(accessToken);
 }
 
 function apiInstanceParamsFactory(params: ApiInstanceParams) {
@@ -47,7 +54,6 @@ const onRequest = (
 ): InternalAxiosRequestConfig => {
   const { method, url } = config;
   logOnDev(`🚀 [API] ${method?.toUpperCase()} ${url} | Request`);
-
   config.headers = config.headers ?? {};
   config.headers.Authorization = `Bearer ${getCurrentAccessToken()}`;
   return config;
@@ -57,32 +63,53 @@ const onResponse = (response: AxiosResponse): AxiosResponse => {
   return response;
 };
 
-const onErrorResponse = (error: AxiosError | Error): Promise<AxiosError> => {
-  if (isAxiosError(error)) {
-    const { message } = error;
-    const { method, url } = error.config as AxiosRequestConfig;
-    const { status } = (error.response as AxiosResponse) ?? {};
-
-    logOnDev(
-      `🚨 [API] ${method?.toUpperCase()} ${url} | Error ${status} ${message}`,
-    );
-
-    switch (status) {
-      case 401: {
-        break;
-      }
-      default: {
-        break;
-      }
-    }
-  } else {
+const onErrorResponse = async (
+  error: AxiosError | Error,
+): Promise<AxiosError> => {
+  if (!isAxiosError(error)) {
     logOnDev(`🚨 [API] | Error ${error.message}`);
+    return Promise.reject(error);
+  }
+
+  const { message, response } = error;
+  const config = error.config as AxiosRequestRetryConfig;
+
+  if (!config) return Promise.reject(error);
+
+  const { method, url } = config;
+
+  logOnDev(
+    `🚨 [API] ${method?.toUpperCase()} ${url} | Error ${
+      response?.status
+    } ${message}`,
+  );
+
+  if (
+    response?.status === 401 &&
+    response?.data.message === 'Token expired' &&
+    !config._retry
+  ) {
+    config._retry = true;
+
+    const AuthApiInstance = apiInstanceParamsFactory({ axiosInstance })(
+      AuthApiFactory,
+    );
+    const {
+      data: { accessToken },
+    } = await AuthApiInstance.authControllerRefreshToken();
+
+    setAccessToken(accessToken);
+
+    config.headers = config.headers ?? {};
+    config.headers.Authorization = `Bearer ${accessToken}`;
+
+    return axiosInstance(config);
   }
 
   return Promise.reject(error);
 };
 
-axiosInstance.interceptors.request.use(onRequest, onErrorResponse);
+axiosInstance.interceptors.request.use(onRequest);
 axiosInstance.interceptors.response.use(onResponse, onErrorResponse);
 
 const apiInstanceFactory = apiInstanceParamsFactory({ axiosInstance });
