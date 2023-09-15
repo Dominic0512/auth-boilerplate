@@ -32,7 +32,7 @@ services:
     environment:
       - SERVICE=user
     volumes:
-      - ../:/var/app/auth-boilerplat
+      - ../:/var/app/auth-boilerplate
   web-client:
     image: node-dev:local
     container_name: web-client

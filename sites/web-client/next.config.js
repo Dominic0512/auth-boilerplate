@@ -26,12 +26,12 @@ const nextConfig = {
       {
         source: '/authorize/facebook',
         destination: authorizeUrlFactory('facebook'),
-        permanent: true
+        permanent: false
       },
       {
         source: '/authorize/google',
         destination: authorizeUrlFactory('google-oauth2'),
-        permanent: true
+        permanent: false
       },
     ]
   }

@@ -16,10 +16,9 @@ export class RefreshTokenInterceptor implements NestInterceptor {
   constructor(private readonly configService: ConfigService) {
     this.refreshTokenOptions = {
       httpOnly: true,
-      secure:
-        this.configService.get('core.nodeEnv') === 'production' ? true : false,
+      secure: true,
       maxAge: this.configService.get('core.refreshTokenAging') * 1000,
-      sameSite: false,
+      sameSite: 'none',
     };
   }
 
