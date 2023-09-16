@@ -2,13 +2,19 @@
 name: auth-boilerplate
 version: '3.9'
 services:
+  nginx:
+    image: nginx:1.25.2-alpine
+    volumes:
+      - ./data/nginx:/etc/nginx/conf.d
+    ports:
+      - '80:80'
+    command: '/bin/sh -c ''while :; do sleep 24h & wait $${!}; nginx -s reload; done & nginx -g "daemon off;"'''
+    restart: unless-stopped
   gateway:
     image: auth-boilerplate:latest
     container_name: gateway
     environment:
       - SERVICE=gateway
-    ports:
-      - '10001:8000'
     restart: on-failure
   user:
     image: auth-boilerplate:latest
@@ -21,6 +27,4 @@ services:
     container_name: web-client
     environment:
       - SERVICE=web-client
-    ports:
-      - '11001:3000'
     restart: on-failure

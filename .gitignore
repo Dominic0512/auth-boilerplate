@@ -9,6 +9,7 @@ cockroach-data/
 .env.development
 .env.production
 .env.makefile
+docker/nginx/app.conf
 
 # Terraform
 *.tfstate

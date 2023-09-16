@@ -1,0 +1,32 @@
+server {
+  listen 80;
+  server_name auth-boilerplate.your.domain;
+  server_tokens off;
+
+  access_log /var/log/nginx/auth-boilerplate.access.log;
+
+  location / {
+		proxy_pass  http://web-client:3000;
+		proxy_set_header    Host                $http_host;
+		proxy_set_header    X-Real-IP           $remote_addr;
+		proxy_set_header    X-Forwarded-For     $proxy_add_x_forwarded_for;
+  }
+}
+
+server {
+	listen 80;
+	server_name auth-boilerplate-api.your.domain;
+	server_tokens off;
+
+  access_log /var/log/nginx/auth-boilerplate-api.access.log;
+
+	location / {
+		proxy_pass  http://gateway:8000;
+		proxy_set_header    Host                $http_host;
+		proxy_set_header    X-Real-IP           $remote_addr;
+		proxy_set_header    X-Forwarded-For     $proxy_add_x_forwarded_for;
+	}
+}
+
+
+
