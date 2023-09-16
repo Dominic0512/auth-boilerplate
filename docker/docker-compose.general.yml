@@ -1,6 +1,6 @@
 # @format
 name: auth-boilerplate
-version: "3.9"
+version: '3.9'
 services:
   gateway:
     image: auth-boilerplate:latest
@@ -8,10 +8,19 @@ services:
     environment:
       - SERVICE=gateway
     ports:
-      - "10001:8000"
+      - '10001:8000'
+    restart: on-failure
   user:
     image: auth-boilerplate:latest
     container_name: user
     environment:
       - SERVICE=user
+    restart: on-failure
+  web-client:
+    image: auth-boilerplate:latest
+    container_name: web-client
+    environment:
+      - SERVICE=web-client
+    ports:
+      - '11001:3000'
     restart: on-failure

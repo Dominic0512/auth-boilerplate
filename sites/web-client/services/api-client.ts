@@ -71,7 +71,8 @@ const onErrorResponse = async (
     return Promise.reject(error);
   }
 
-  const { message, response } = error;
+  const { message } = error;
+  const response = error.response as AxiosResponse;
   const config = error.config as AxiosRequestRetryConfig;
 
   if (!config) return Promise.reject(error);
