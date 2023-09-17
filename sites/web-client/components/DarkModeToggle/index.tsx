@@ -50,7 +50,7 @@ export default function DarkModeToggle() {
 
   return (
     <button
-      className="relative w-12 h-12 overflow-hidden rounded-full border-base hover:border-gray-300 inline-flex items-center justify-center border-2 transition focus:outline-none"
+      className="relative w-full h-full overflow-hidden rounded-full border-base hover:border-gray-300 inline-flex items-center justify-center border-2 transition focus:outline-none"
       onClick={darkModeToggle}
     >
       <div className="relative w-full h-full">

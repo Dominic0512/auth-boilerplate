@@ -36,25 +36,58 @@ function Navbar() {
   }, [logoutMutation, router]);
 
   return (
-    <nav className="w-screen max-w-12xl fixed flex flex-row px-8 py-4 items-center justify-between bg-base-100 z-50">
-      <Link className="text-2xl font-bold" href="/">
-        <h1>Auth Boilerplate Demo</h1>
-      </Link>
-      <div className="flex-1 mx-8">
-        <ul className="flex flex-row items-center justify-end gap-4">
+    <nav className="w-screen max-w-12xl fixed flex flex-row p-2 md:p-4 items-center justify-between bg-base-100 z-50">
+      <div className="mx-2 md:mx-4 flex">
+        <Link className="hidden md:block text-2xl font-bold" href="/">
+          <h1>Auth Boilerplate</h1>
+        </Link>
+        <div className="block md:hidden dropdown">
+          <label tabIndex={0} className="btn btn-ghost btn-circle">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-8 w-8"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M4 6h16M4 12h16M4 18h7"
+              />
+            </svg>
+          </label>
+          <ul
+            tabIndex={0}
+            className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
+          >
+            {links.map((link) => (
+              <NavLink key={link.name} href={link.href}>
+                <span className="text-lg">{link.name}</span>
+              </NavLink>
+            ))}
+          </ul>
+        </div>
+      </div>
+      <div className="flex-1 mx-2 md:mx-4 flex justify-center md:justify-end">
+        <ul className="hidden md:flex flex-row items-center justify-center md:justify-end gap-4">
           {links.map((link) => (
             <NavLink key={link.name} href={link.href}>
               <span className="text-lg">{link.name}</span>
             </NavLink>
           ))}
         </ul>
+        <Link className="inline md:hidden text-md font-bold" href="/">
+          <span>Auth Boilerplate</span>
+        </Link>
       </div>
-      <div className="flex items-center gap-4">
-        <div>
+      <div className="mx-2 md:mx-4 flex items-center gap-4 ">
+        <div className="relative w-10 md:w-12 h-10 md:h-12">
           <DarkModeToggle />
         </div>
         {!isError && isFetched ? (
-          <div className="dropdown dropdown-end">
+          <div className="dropdown dropdown-end relative w-10 md:w-12 h-10 md:h-12 ">
             <Avatar name={data?.name} />
             <ul className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
               <li>
