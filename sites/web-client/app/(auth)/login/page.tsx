@@ -8,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import zod from 'zod';
 
 import { useLogin } from '@/hooks/react-query/auth';
+import { auth0RedirectUrlFactory } from '@/services/authorize';
 import { passwordRule } from '../shared';
 
 interface FormData {
@@ -18,6 +19,13 @@ interface FormData {
 const formSchema = zod.object({
   email: zod.string().email(),
   password: passwordRule,
+});
+
+const authorizeUrlFactory = auth0RedirectUrlFactory({
+  authorizeUrl: process.env.NEXT_PUBLIC_OAUTH_CLIENT_AUTH_URL ?? '',
+  clientId: process.env.NEXT_PUBLIC_OAUTH_CLIENT_ID ?? '',
+  callbackUrl: `${process.env.NEXT_PUBLIC_WEB_CLIENT_HOST}/oauth-callback`,
+  state: '',
 });
 
 export default function Login() {
@@ -71,10 +79,16 @@ export default function Login() {
             Login
           </button>
           <div className="divider">OR</div>
-          <Link href="/authorize/facebook" className="btn btn-facebook">
+          <Link
+            href={authorizeUrlFactory('facebook')}
+            className="btn btn-facebook"
+          >
             Continue With Facebook
           </Link>
-          <Link href="/authorize/google" className="btn btn-google">
+          <Link
+            href={authorizeUrlFactory('google-oauth2')}
+            className="btn btn-google"
+          >
             Continue With Google
           </Link>
           <Link href="register" className="underline text-center">
